@@ -7,11 +7,11 @@ import {
   required,
   SelectInput,
   SimpleForm,
-  SimpleFormIterator,
   TextInput,
 } from 'react-admin';
 import BookIcon from '@material-ui/icons/Book';
 import { ContentTypeList } from './ContentTypeList';
+import OrderedFormIterator from '../components/OrderedFormIterator';
 
 const ContentTypeTitle = ({ record }) => {
   return <span>Content Type {record ? `"${record.type}"` : ''}</span>;
@@ -23,7 +23,7 @@ const Fields = props => {
       <TextInput source="type" validate={required()} />
       <SelectInput source="icon" label="icon" choices={[{ id: 'BookIcon', name: 'BookIcon' }]} />
       <ArrayInput source="fields">
-        <SimpleFormIterator>
+        <OrderedFormIterator>
           <TextInput required label="Field name" source="title" />
           <SelectInput
             source="fieldType"
@@ -36,7 +36,7 @@ const Fields = props => {
           />
           <BooleanInput label="Is required?" source="isRequired" />
           <BooleanInput label="Display in list view?" source="_gridDisplay_" />
-        </SimpleFormIterator>
+        </OrderedFormIterator>
       </ArrayInput>
     </>
   );

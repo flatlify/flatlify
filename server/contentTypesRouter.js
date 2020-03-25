@@ -17,7 +17,7 @@ const createPutOne = root =>
     };
 
     const itemPath = path.resolve(root, `${contentType}`, `${newId}.json`);
-    const newDirPath = path.resolve(root, `${req.body.data.type}`);
+    const newDirPath = path.resolve(root, `${req.body.data.type.toLowerCase()}`);
     await Promise.all([utils.save(itemPath, newContentType, utils.ensureDir(newDirPath))]);
 
     res.send(newContentType);
@@ -32,8 +32,8 @@ async function patch(root, itemId, contentType, updateParams) {
   };
 
   if (updateParams.type) {
-    const contentFolderPath = path.resolve(root, 'content', item.type);
-    const newContentFolderPath = path.resolve(root, 'content', updateParams.type);
+    const contentFolderPath = path.resolve(root, 'content', item.type.toLowerCase());
+    const newContentFolderPath = path.resolve(root, 'content', updateParams.type.toLowerCase());
     await fs.rename(contentFolderPath, newContentFolderPath);
   }
   await utils.save(contentPath, newItem);
