@@ -13,6 +13,8 @@ import {
 import BookIcon from '@material-ui/icons/Book';
 import { ContentTypeList } from './ContentTypeList';
 import { ImageInputConfig, ImageField } from '../components/ImageInput';
+import { ReferenceInputConfig } from '../components/ReferenceInput';
+
 import get from 'lodash/get';
 import OrderedFormIterator from '../components/OrderedFormIterator';
 
@@ -23,6 +25,8 @@ const getFieldConfig = (fieldType, source) => {
   switch (fieldType) {
     case 'ImageInput':
       return <ImageInputConfig source={source} />;
+    case 'ReferenceInput':
+      return <ReferenceInputConfig source={source} />;
     default:
       return <></>;
   }
@@ -44,12 +48,16 @@ const Fields = props => {
               { id: 'TextInput', name: 'Text' },
               { id: 'RichTextInput', name: 'Rich Text' },
               { id: 'ImageInput', name: 'Image' },
+              { id: 'ReferenceInput', name: 'ReferenceInput' },
             ]}
           />
           {getFieldConfig()}
           <FormDataConsumer>
             {props => {
-              return getFieldConfig(get(props, `formData.${props.id}.fieldType`), props.id);
+              return getFieldConfig(
+                get(props, `formData.${props.id.substring(0, 9)}.fieldType`),
+                props.id,
+              );
             }}
           </FormDataConsumer>
           <BooleanInput label="Is required?" source="isRequired" />
