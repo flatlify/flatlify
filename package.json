@@ -1,5 +1,5 @@
 {
-  "name": "flatlify",
+  "name": "flatlify-react-admin-example",
   "version": "0.0.1",
   "description": "Flat file NodeJS based CMS",
   "main": "index.js",
@@ -42,7 +42,7 @@
     "deep-diff": "^1.0.2",
     "dotenv": "^8.0.0",
     "express": "^4.17.0",
-    "flatlify-server": "^1.0.0",
+    "flatlify-server": "git+https://github.com/flatlify/flatlify.git#new-server",
     "fs-extra": "^8.0.1",
     "glob": "^7.1.6",
     "globby": "^10.0.1",
