@@ -45,13 +45,7 @@ module.exports = (root, gitRepositoryRoot) => {
     res.send({ data });
   }
 
-  async function update(
-    root,
-    itemId,
-    contentType,
-    updateParams,
-    gitRepositoryRoot,
-  ) {
+  async function update(itemId, contentType, updateParams, gitRepositoryRoot) {
     const relativeContentPath = `${contentType}/${itemId}.json`;
     const contentPath = `${root}/${relativeContentPath}`;
 
@@ -75,7 +69,6 @@ module.exports = (root, gitRepositoryRoot) => {
     const params = req.body;
 
     const data = await update(
-      root,
       itemId,
       contentType,
       {
@@ -94,7 +87,7 @@ module.exports = (root, gitRepositoryRoot) => {
     const { ids } = req.query;
 
     const updatePromises = ids.map((id) =>
-      update(root, id, contentType, params, gitRepositoryRoot),
+      update(id, contentType, params, gitRepositoryRoot),
     );
 
     await Promise.all(updatePromises);
@@ -127,7 +120,7 @@ module.exports = (root, gitRepositoryRoot) => {
     res.send(newContentType);
   }
 
-  async function deleteItem(root, contentType, itemId, gitRepositoryRoot) {
+  async function deleteItem(contentType, itemId, gitRepositoryRoot) {
     const relativeItemPath = `${contentType}/${itemId}.json`;
     const contentItemPath = `${root}/${relativeItemPath}`;
 

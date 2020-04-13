@@ -3,9 +3,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const fse = require("fs-extra");
+const findGitRoot = require("find-git-root");
 const contentRouter = require("./contentRouter");
 const contentTypesRouter = require("./contentTypesRouter");
-const findGitRoot = require("find-git-root");
 
 require("dotenv").config();
 
@@ -14,7 +14,7 @@ async function server({ publicBaseUrl, dbDir }) {
   const DEFAULT_PORT = 3020;
   const port = parseInt(process.env.PORT, 10) || DEFAULT_PORT;
 
-  const gitRepositoryRoot = findGitRoot(dbDir);
+  const gitRepositoryRoot = path.resolve(findGitRoot(dbDir), "..");
 
   app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
