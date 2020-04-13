@@ -1,31 +1,36 @@
-const path = require('path');
-const fs = require('fs').promises;
-const express = require('express');
-const gitUtils = require('./git-utils');
-const { orderBy, slice } = require('lodash');
-const utils = require('./utils/common');
+const path = require("path");
+const fs = require("fs").promises;
+const express = require("express");
+const { orderBy, slice } = require("lodash");
+const gitUtils = require("./git-utils");
+const utils = require("./utils/common");
+const media = require("./utils/media");
+
 const { getContentType } = utils;
 
 module.exports = (root, gitRepositoryRoot) => {
-  const { fileFieldsAppendSrc } = require('./utils/media')(root);
+  const { fileFieldsAppendSrc } = media(root);
 
   async function getMany(req, res) {
     const contentType = getContentType(req);
 
-    const pagination = req.query && req.query.pagination ? JSON.parse(req.query.pagination) : {};
+    const pagination =
+      req.query && req.query.pagination ? JSON.parse(req.query.pagination) : {};
     const sort = req.query && req.query.sort ? JSON.parse(req.query.sort) : {};
 
     const _start = (pagination.page - 1) * pagination.perPage || 0;
     const _end = pagination.page * pagination.perPage || 25;
-    const _order = sort.order || 'ASC';
-    const _sort = sort.field || 'id';
+    const _order = sort.order || "ASC";
+    const _sort = sort.field || "id";
 
     const contentPath = path.resolve(root, `${contentType}`);
     const files = await utils.readCollectionList(contentPath);
-    const items = fileFieldsAppendSrc(slice(orderBy(files, [_sort], [_order]), _start, _end));
+    const items = fileFieldsAppendSrc(
+      slice(orderBy(files, [_sort], [_order]), _start, _end),
+    );
 
-    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
-    res.setHeader('X-Total-Count', items.length);
+    res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
+    res.setHeader("X-Total-Count", items.length);
     res.send({
       data: items,
       total: files.length,
@@ -57,7 +62,9 @@ module.exports = (root, gitRepositoryRoot) => {
     const itemPath = `${root}/${relativeItemPath}`;
     const newDirPath = path.resolve(root, `${req.body.type.toLowerCase()}`);
 
-    await Promise.all([utils.save(itemPath, newContentType, utils.ensureDir(newDirPath))]);
+    await Promise.all([
+      utils.save(itemPath, newContentType, utils.ensureDir(newDirPath)),
+    ]);
 
     await gitUtils.commit([itemPath], gitRepositoryRoot, {
       message: `Flatlify created file: ${relativeItemPath}`,
@@ -66,7 +73,13 @@ module.exports = (root, gitRepositoryRoot) => {
     res.send(newContentType);
   }
 
-  async function update(root, itemId, contentType, updateParams, gitRepositoryRoot) {
+  async function update(
+    root,
+    itemId,
+    contentType,
+    updateParams,
+    gitRepositoryRoot,
+  ) {
     const relativeContentPath = `${contentType}/${itemId}.json`;
     const contentPath = `${root}/${relativeContentPath}`;
 
@@ -77,8 +90,16 @@ module.exports = (root, gitRepositoryRoot) => {
     };
 
     if (updateParams.type) {
-      const contentFolderPath = path.resolve(root, 'content', item.type.toLowerCase());
-      const newContentFolderPath = path.resolve(root, 'content', updateParams.type.toLowerCase());
+      const contentFolderPath = path.resolve(
+        root,
+        "content",
+        item.type.toLowerCase(),
+      );
+      const newContentFolderPath = path.resolve(
+        root,
+        "content",
+        updateParams.type.toLowerCase(),
+      );
       utils.ensureDir(contentFolderPath);
       await fs.rename(contentFolderPath, newContentFolderPath);
     }
@@ -96,7 +117,13 @@ module.exports = (root, gitRepositoryRoot) => {
     const { itemId } = req.params;
     const params = req.body;
 
-    const data = await update(root, itemId, contentType, params, gitRepositoryRoot);
+    const data = await update(
+      root,
+      itemId,
+      contentType,
+      params,
+      gitRepositoryRoot,
+    );
 
     res.status(200).send({ data });
   }
@@ -106,8 +133,9 @@ module.exports = (root, gitRepositoryRoot) => {
     const params = req.body;
     const { ids } = req.query;
 
-    const updatePromises = ids.map(id => update(root, id, contentType, params, gitRepositoryRoot));
-
+    const updatePromises = ids.map((id) =>
+      update(root, id, contentType, params, gitRepositoryRoot),
+    );
     await Promise.all(updatePromises);
 
     res.status(200).send({ data: ids });
@@ -125,7 +153,10 @@ module.exports = (root, gitRepositoryRoot) => {
       remove: true,
     });
 
-    await Promise.all([utils.remove(contentItemPath), utils.remove(contentFolderPath)]);
+    await Promise.all([
+      utils.remove(contentItemPath),
+      utils.remove(contentFolderPath),
+    ]);
     return {};
   }
 
@@ -143,7 +174,9 @@ module.exports = (root, gitRepositoryRoot) => {
 
     const ids = req.body;
 
-    const deletePromises = ids.map(id => deleteItem(root, contentType, id, gitRepositoryRoot));
+    const deletePromises = ids.map((id) =>
+      deleteItem(root, contentType, id, gitRepositoryRoot),
+    );
     await Promise.all(deletePromises);
 
     res.send({ data: {} });
@@ -151,19 +184,19 @@ module.exports = (root, gitRepositoryRoot) => {
 
   const router = express.Router();
 
-  router.get('/:contentType', getMany);
+  router.get("/:contentType", getMany);
 
-  router.get('/:contentType/:itemId', getOne);
+  router.get("/:contentType/:itemId", getOne);
 
-  router.put('/:contentType/:itemId', updateOne);
+  router.put("/:contentType/:itemId", updateOne);
 
-  router.put('/:contentType', updateMany);
+  router.put("/:contentType", updateMany);
 
-  router.post('/:contentType', createOne);
+  router.post("/:contentType", createOne);
 
-  router.delete('/:contentType/:itemId', deleteOne);
+  router.delete("/:contentType/:itemId", deleteOne);
 
-  router.delete('/:contentType', deleteMany);
+  router.delete("/:contentType", deleteMany);
 
   return router;
 };

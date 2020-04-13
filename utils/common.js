@@ -1,13 +1,13 @@
-const path = require('path');
-const fs = require('fs').promises;
-const fse = require('fs-extra');
+const path = require("path");
+const fs = require("fs").promises;
+const fse = require("fs-extra");
 
 function ensureDir(dir) {
   return fse.ensureDir(dir);
 }
 
 function save(filepath, json) {
-  return fse.outputJson(filepath, json, { spaces: '  ' });
+  return fse.outputJson(filepath, json, { spaces: "  " });
 }
 
 function read(filepath) {
@@ -22,19 +22,19 @@ async function readCollectionList(dirname) {
   if (await fse.pathExists(dirname)) {
     const filenames = await fs.readdir(dirname);
 
-    const filesPromises = filenames.map(async filename => {
+    const filesPromises = filenames.map(async (filename) => {
       const filePath = path.resolve(dirname, filename);
       const stat = await fs.stat(filePath);
 
       if (stat && stat.isFile()) {
-        return fse.readJson(filePath, { encoding: 'utf-8' });
+        return fse.readJson(filePath, { encoding: "utf-8" });
       }
       return [];
     });
 
-    let files = await Promise.all(filesPromises);
+    const files = await Promise.all(filesPromises);
 
-    const filteredFiles = files.filter(empty => !!empty);
+    const filteredFiles = files.filter((empty) => !!empty);
     return filteredFiles;
   }
   return [];
@@ -45,9 +45,9 @@ async function readCollections(dirname) {
   const dirs = await fs.readdir(dirname);
 
   await Promise.all(
-    dirs.map(dirPath => {
+    dirs.map((dirPath) => {
       const dir = path.resolve(dirname, dirPath);
-      return fs.stat(dir).then(async stat => {
+      return fs.stat(dir).then(async (stat) => {
         if (stat && stat.isDirectory()) {
           db[dirPath] = await readCollectionList(dir);
         }
@@ -69,7 +69,7 @@ function getNewIdFromDatabaseItems(items) {
   if (items.length === 1) {
     return Number(items[0].id) + 1;
   }
-  const maxId = Math.max(...items.map(item => Number(item.id)));
+  const maxId = Math.max(...items.map((item) => Number(item.id)));
   return maxId + 1;
 }
 
