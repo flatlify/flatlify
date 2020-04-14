@@ -1,8 +1,0 @@
-{
-  "type": "Video",
-  "fields": [
-    { "fieldType": "TextInput", "title": "fieldnewnew", "isRequired": true, "_gridDisplay_": true },
-    { "fieldType": "TextInput", "title": "field2", "_gridDisplay_": true, "isRequired": true }
-  ],
-  "id": 2
-}
