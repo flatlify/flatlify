@@ -3,21 +3,10 @@ const path = require("path");
 const fse = require("fs-extra");
 const get = require("lodash/get");
 
-function createMedia(root) {
+function createMedia(root, publicBaseUrl) {
   const storage = multer.diskStorage({
     async destination(req, file, callback) {
-      let destinationDir = path.resolve(
-        root,
-        process.env.MEDIA_UPLOAD_DIRECTORY,
-      );
-      if (process.env.MEDIA_DATES_FOLDER) {
-        destinationDir = path.resolve(
-          destinationDir,
-          String(new Date().getFullYear()),
-          String(new Date().getMonth() + 1),
-          String(new Date().getDate()),
-        );
-      }
+      const destinationDir = path.resolve(root, publicBaseUrl);
       await fse.ensureDir(destinationDir);
 
       callback(null, destinationDir);
@@ -33,7 +22,7 @@ function createMedia(root) {
   const appendSrc = (file) => {
     return {
       ...file,
-      src: `${process.env.MEDIA_PUBLIC_BASE_URL}${file.relativeSrc}`,
+      src: `${publicBaseUrl}/${file.relativeSrc}`,
     };
   };
 
@@ -84,4 +73,4 @@ function createMedia(root) {
     fileFieldsAppendSrc,
   };
 }
-module.exports = (root) => createMedia(root);
+module.exports = (root, publicBaseUrl) => createMedia(root, publicBaseUrl);

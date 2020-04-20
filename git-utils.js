@@ -22,9 +22,9 @@ async function status({ root, pattern = "server/db/**/*" } = {}) {
     pattern: "**/*",
   });
   const modifiedFiles = status
-    .filter((row) => paths.indexOf(row[0]) !== -1)
+    .filter(row => paths.indexOf(row[0]) !== -1)
     .filter(checkModified)
-    .map((row) => ({
+    .map(row => ({
       id: encodeURIComponent(row[0]),
       filepath: row[0],
       statusCodes: row.slice(1),
@@ -52,7 +52,7 @@ async function commit(
     remove = false,
   } = {},
 ) {
-  const gitAddPromises = filePaths.map(async (filepath) => {
+  const gitAddPromises = filePaths.map(async filepath => {
     const relativeFilePath = path.relative(gitRepositoryRoot, filepath);
 
     if (!remove) {

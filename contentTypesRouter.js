@@ -8,8 +8,8 @@ const media = require("./utils/media");
 
 const { getContentType } = utils;
 
-module.exports = (root, gitRepositoryRoot) => {
-  const { fileFieldsAppendSrc } = media(root);
+module.exports = (root, gitRepositoryRoot, publicBaseUrl) => {
+  const { fileFieldsAppendSrc } = media(root, publicBaseUrl);
 
   async function getMany(req, res) {
     const contentType = getContentType(req);

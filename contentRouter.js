@@ -7,8 +7,12 @@ const media = require("./utils/media");
 
 const { getContentType } = utils;
 
-module.exports = (root, gitRepositoryRoot) => {
-  const { extractFilesMeta, fileFieldsAppendSrc } = media(root);
+module.exports = (root, gitRepositoryRoot, publicBaseUrl) => {
+  const { upload, extractFilesMeta, fileFieldsAppendSrc } = media(
+    root,
+    publicBaseUrl,
+  );
+  const uploadMiddleware = upload.any();
 
   async function getMany(req, res) {
     const contentType = getContentType(req);
@@ -161,11 +165,11 @@ module.exports = (root, gitRepositoryRoot) => {
 
   router.get("/:contentType/:itemId", getOne);
 
-  router.put("/:contentType/:itemId", updateOne);
+  router.put("/:contentType/:itemId", uploadMiddleware, updateOne);
 
-  router.put("/:contentType", updateMany);
+  router.put("/:contentType", uploadMiddleware, updateMany);
 
-  router.post("/:contentType", createOne);
+  router.post("/:contentType", uploadMiddleware, createOne);
 
   router.delete("/:contentType/:itemId", deleteOne);
 
