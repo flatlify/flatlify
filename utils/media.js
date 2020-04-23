@@ -1,12 +1,11 @@
 const multer = require("multer");
 const path = require("path");
 const fse = require("fs-extra");
-const get = require("lodash/get");
 
-function createMedia(root, publicBaseUrl) {
+function createMedia(dbDir, mediaUploadDir) {
   const storage = multer.diskStorage({
     async destination(req, file, callback) {
-      const destinationDir = path.resolve(root, publicBaseUrl);
+      const destinationDir = path.resolve(dbDir, mediaUploadDir);
       await fse.ensureDir(destinationDir);
 
       callback(null, destinationDir);
@@ -19,37 +18,11 @@ function createMedia(root, publicBaseUrl) {
   });
   const upload = multer({ storage });
 
-  const appendSrc = (file) => {
-    return {
-      ...file,
-      src: `${publicBaseUrl}/${file.relativeSrc}`,
-    };
-  };
-
-  const fileFieldsAppendSrc = (files = []) =>
-    files.map((file) => {
-      const updatedEntry = { ...file };
-      // eslint-disable-next-line no-restricted-syntax
-      for (const fieldName in file) {
-        if (Array.isArray(file[fieldName])) {
-          updatedEntry[fieldName] = file[fieldName].map((field) => {
-            if (get(field, "filename")) {
-              return appendSrc(field);
-            }
-            return field;
-          });
-        } else if (get(file[fieldName], "filename")) {
-          updatedEntry[fieldName] = appendSrc(updatedEntry[fieldName]);
-        }
-      }
-      return updatedEntry;
-    });
-
   const extractFilesMeta = (files = []) => {
     /* eslint-disable no-param-reassign */
     return files.reduce((result, file) => {
       const newFieldValue = {
-        relativeSrc: `/${path.relative(root, file.path)}`,
+        relativeSrc: `/${path.relative(dbDir, file.path)}`,
         filename: file.filename,
         size: file.size,
         mimetype: file.mimetype,
@@ -70,7 +43,6 @@ function createMedia(root, publicBaseUrl) {
   return {
     upload,
     extractFilesMeta,
-    fileFieldsAppendSrc,
   };
 }
 module.exports = (root, publicBaseUrl) => createMedia(root, publicBaseUrl);

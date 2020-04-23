@@ -4,13 +4,10 @@ const express = require("express");
 const { orderBy, slice } = require("lodash");
 const gitUtils = require("./git-utils");
 const utils = require("./utils/common");
-const media = require("./utils/media");
 
 const { getContentType } = utils;
 
-module.exports = (root, gitRepositoryRoot, publicBaseUrl) => {
-  const { fileFieldsAppendSrc } = media(root, publicBaseUrl);
-
+module.exports = (root, gitRepositoryRoot) => {
   async function getMany(req, res) {
     const contentType = getContentType(req);
 
@@ -25,9 +22,7 @@ module.exports = (root, gitRepositoryRoot, publicBaseUrl) => {
 
     const contentPath = path.resolve(root, `${contentType}`);
     const files = await utils.readCollectionList(contentPath);
-    const items = fileFieldsAppendSrc(
-      slice(orderBy(files, [_sort], [_order]), _start, _end),
-    );
+    const items = slice(orderBy(files, [_sort], [_order]), _start, _end);
 
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
     res.setHeader("X-Total-Count", items.length);
@@ -42,7 +37,7 @@ module.exports = (root, gitRepositoryRoot, publicBaseUrl) => {
     const contentType = getContentType(req);
 
     const contentPath = path.resolve(root, `${contentType}`, `${itemId}.json`);
-    const [data] = fileFieldsAppendSrc([await utils.read(contentPath)]);
+    const data = await utils.read(contentPath);
     res.send({ data });
   }
 

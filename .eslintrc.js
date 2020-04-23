@@ -21,5 +21,6 @@ module.exports = {
     "function-paren-newline": "off",
     "no-console": ["error", { allow: ["warn", "error", "info"] }],
     "arrow-body-style": "off",
+    "no-use-before-define": "off",
   },
 };
