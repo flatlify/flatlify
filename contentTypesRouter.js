@@ -7,7 +7,7 @@ const utils = require("./utils/common");
 
 const { getContentType } = utils;
 
-module.exports = (root, gitRepositoryRoot) => {
+module.exports = (dbDir, repositoryRoot) => {
   async function getMany(req, res) {
     const contentType = getContentType(req);
 
@@ -20,7 +20,7 @@ module.exports = (root, gitRepositoryRoot) => {
     const _order = sort.order || "ASC";
     const _sort = sort.field || "id";
 
-    const contentPath = path.resolve(root, `${contentType}`);
+    const contentPath = path.resolve(dbDir, `${contentType}`);
     const files = await utils.readCollectionList(contentPath);
     const items = slice(orderBy(files, [_sort], [_order]), _start, _end);
 
@@ -36,7 +36,7 @@ module.exports = (root, gitRepositoryRoot) => {
     const { itemId } = req.params;
     const contentType = getContentType(req);
 
-    const contentPath = path.resolve(root, `${contentType}`, `${itemId}.json`);
+    const contentPath = path.resolve(dbDir, `${contentType}`, `${itemId}.json`);
     const data = await utils.read(contentPath);
     res.send({ data });
   }
@@ -44,7 +44,7 @@ module.exports = (root, gitRepositoryRoot) => {
   async function createOne(req, res) {
     const contentType = getContentType(req);
 
-    const contentPath = path.resolve(root, `${contentType}`);
+    const contentPath = path.resolve(dbDir, `${contentType}`);
     const items = await utils.readCollectionList(contentPath);
 
     const newId = utils.getNewIdFromDatabaseItems(items);
@@ -54,23 +54,23 @@ module.exports = (root, gitRepositoryRoot) => {
       id: newId,
     };
     const relativeItemPath = `${contentType}/${newId}.json`;
-    const itemPath = `${root}/${relativeItemPath}`;
-    const newDirPath = path.resolve(root, `${req.body.type.toLowerCase()}`);
+    const itemPath = `${dbDir}/${relativeItemPath}`;
+    const newDirPath = path.resolve(dbDir, `${req.body.type.toLowerCase()}`);
 
     await Promise.all([
       utils.save(itemPath, newContentType, utils.ensureDir(newDirPath)),
     ]);
 
-    await gitUtils.commit([itemPath], gitRepositoryRoot, {
+    await gitUtils.commit([itemPath], repositoryRoot, {
       message: `Flatlify created file: ${relativeItemPath}`,
     });
 
     res.send(newContentType);
   }
 
-  async function update(itemId, contentType, updateParams, gitRepositoryRoot) {
+  async function update(itemId, contentType, updateParams, repositoryRoot) {
     const relativeContentPath = `${contentType}/${itemId}.json`;
-    const contentPath = `${root}/${relativeContentPath}`;
+    const contentPath = `${dbDir}/${relativeContentPath}`;
 
     const item = await utils.read(contentPath);
     const newItem = {
@@ -80,12 +80,12 @@ module.exports = (root, gitRepositoryRoot) => {
 
     if (updateParams.type) {
       const contentFolderPath = path.resolve(
-        root,
+        dbDir,
         "content",
         item.type.toLowerCase(),
       );
       const newContentFolderPath = path.resolve(
-        root,
+        dbDir,
         "content",
         updateParams.type.toLowerCase(),
       );
@@ -94,7 +94,7 @@ module.exports = (root, gitRepositoryRoot) => {
     }
     await utils.save(contentPath, newItem);
 
-    await gitUtils.commit([contentPath], gitRepositoryRoot, {
+    await gitUtils.commit([contentPath], repositoryRoot, {
       message: `Flatlify updated file: ${relativeContentPath}`,
     });
 
@@ -106,7 +106,7 @@ module.exports = (root, gitRepositoryRoot) => {
     const { itemId } = req.params;
     const params = req.body;
 
-    const data = await update(itemId, contentType, params, gitRepositoryRoot);
+    const data = await update(itemId, contentType, params, repositoryRoot);
 
     res.status(200).send({ data });
   }
@@ -117,21 +117,21 @@ module.exports = (root, gitRepositoryRoot) => {
     const { ids } = req.query;
 
     const updatePromises = ids.map((id) =>
-      update(id, contentType, params, gitRepositoryRoot),
+      update(id, contentType, params, repositoryRoot),
     );
     await Promise.all(updatePromises);
 
     res.status(200).send({ data: ids });
   }
 
-  async function deleteItem(root, contentType, itemId, gitRepositoryRoot) {
+  async function deleteItem(root, contentType, itemId, repositoryRoot) {
     const relativeItemPath = `${contentType}/${itemId}.json`;
     const contentItemPath = `${root}/${relativeItemPath}`;
 
     const { type } = await utils.read(contentItemPath);
     const contentFolderPath = path.resolve(root, `${type.toLowerCase()}`);
 
-    await gitUtils.commit([contentItemPath], gitRepositoryRoot, {
+    await gitUtils.commit([contentItemPath], repositoryRoot, {
       message: `Flatlify deleted file: ${relativeItemPath}`,
       remove: true,
     });
@@ -147,7 +147,7 @@ module.exports = (root, gitRepositoryRoot) => {
     const { itemId } = req.params;
     const contentType = getContentType(req);
 
-    await deleteItem(root, contentType, itemId, gitRepositoryRoot);
+    await deleteItem(dbDir, contentType, itemId, repositoryRoot);
 
     res.send({ data: {} });
   }
@@ -158,7 +158,7 @@ module.exports = (root, gitRepositoryRoot) => {
     const ids = req.body;
 
     const deletePromises = ids.map((id) =>
-      deleteItem(contentType, id, gitRepositoryRoot),
+      deleteItem(contentType, id, repositoryRoot),
     );
     await Promise.all(deletePromises);
 

@@ -40,7 +40,7 @@ module.exports = (dbDir, repositoryRoot) => {
     res.send({ data });
   }
 
-  async function update(itemId, contentType, updateParams, gitRepositoryRoot) {
+  async function update(itemId, contentType, updateParams, repositoryRoot) {
     const relativeContentPath = `${contentType}/${itemId}.json`;
     const contentPath = `${dbDir}/${relativeContentPath}`;
 
@@ -52,7 +52,7 @@ module.exports = (dbDir, repositoryRoot) => {
 
     await utils.save(contentPath, newItem);
 
-    await gitUtils.commit([contentPath], gitRepositoryRoot, {
+    await gitUtils.commit([contentPath], repositoryRoot, {
       message: `Flatlify updated file: ${relativeContentPath}`,
     });
     return newItem;
@@ -112,13 +112,13 @@ module.exports = (dbDir, repositoryRoot) => {
     res.send(newContentType);
   }
 
-  async function deleteItem(contentType, itemId, gitRepositoryRoot) {
+  async function deleteItem(contentType, itemId, repositoryRoot) {
     const relativeItemPath = `${contentType}/${itemId}.json`;
     const contentItemPath = `${dbDir}/${relativeItemPath}`;
 
     await utils.remove(contentItemPath);
 
-    await gitUtils.commit([contentItemPath], gitRepositoryRoot, {
+    await gitUtils.commit([contentItemPath], repositoryRoot, {
       message: `Flatlify deleted file: ${relativeItemPath}`,
       remove: true,
     });

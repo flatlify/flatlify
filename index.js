@@ -16,7 +16,7 @@ async function server({
 }) {
   const app = express();
 
-  const gitRepositoryRoot = path.resolve(findGitRoot(dbDir), "..");
+  const repositoryRoot = path.resolve(findGitRoot(dbDir), "..");
 
   app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -34,17 +34,14 @@ async function server({
 
   app.use(
     "/content-types",
-    contentTypesRouter(dbDir, gitRepositoryRoot, publicBaseUrl),
+    contentTypesRouter(dbDir, repositoryRoot, publicBaseUrl),
   );
 
-  app.use(
-    "/content/media",
-    mediaRouter(dbDir, gitRepositoryRoot, publicBaseUrl),
-  );
+  app.use("/content/media", mediaRouter(dbDir, repositoryRoot, publicBaseUrl));
 
   app.use(
     "/content",
-    contentRouter(contentRoot, gitRepositoryRoot, publicBaseUrl),
+    contentRouter(contentRoot, repositoryRoot, publicBaseUrl),
   );
   app.use(`/${publicBaseUrl}`, express.static(mediaPath));
 

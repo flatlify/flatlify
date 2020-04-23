@@ -22,9 +22,9 @@ async function status({ root, pattern = "server/db/**/*" } = {}) {
     pattern: "**/*",
   });
   const modifiedFiles = status
-    .filter(row => paths.indexOf(row[0]) !== -1)
+    .filter((row) => paths.indexOf(row[0]) !== -1)
     .filter(checkModified)
-    .map(row => ({
+    .map((row) => ({
       id: encodeURIComponent(row[0]),
       filepath: row[0],
       statusCodes: row.slice(1),
@@ -42,7 +42,7 @@ async function checkout(branch, pattern = null, root) {
 // git commit multiple files
 async function commit(
   filePaths = [],
-  gitRepositoryRoot,
+  repositoryRoot,
   {
     message,
     author = {
@@ -52,14 +52,14 @@ async function commit(
     remove = false,
   } = {},
 ) {
-  const gitAddPromises = filePaths.map(async filepath => {
-    const relativeFilePath = path.relative(gitRepositoryRoot, filepath);
+  const gitAddPromises = filePaths.map(async (filepath) => {
+    const relativeFilePath = path.relative(repositoryRoot, filepath);
 
     if (!remove) {
-      await isoGit.add({ dir: gitRepositoryRoot, filepath: relativeFilePath });
+      await isoGit.add({ dir: repositoryRoot, filepath: relativeFilePath });
     } else {
       await isoGit.remove({
-        dir: gitRepositoryRoot,
+        dir: repositoryRoot,
         filepath: relativeFilePath,
       });
     }
@@ -68,7 +68,7 @@ async function commit(
   await Promise.all(gitAddPromises);
 
   const sha = await isoGit.commit({
-    dir: gitRepositoryRoot,
+    dir: repositoryRoot,
     author: {
       name: author.name,
       email: author.email,
