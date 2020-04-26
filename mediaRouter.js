@@ -1,5 +1,6 @@
 const express = require("express");
 const { orderBy, slice } = require("lodash");
+const { v4: uuidv4 } = require("uuid");
 const utils = require("./utils/common");
 const gitUtils = require("./git-utils");
 const media = require("./utils/media");
@@ -44,9 +45,7 @@ module.exports = (dbDir, repositoryRoot, publicBaseUrl) => {
   });
 
   router.post("/", uploadMiddleware, async (req, res) => {
-    const mediaPath = `${dbDir}/content/media`;
-    const filesInfo = await utils.readCollectionList(mediaPath);
-    const newId = utils.getNewIdFromDatabaseItems(filesInfo);
+    const newId = uuidv4();
     const newMedia = {
       ...extractFilesMeta(req.files).files,
       id: newId,
