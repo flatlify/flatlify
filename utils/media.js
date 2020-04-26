@@ -18,31 +18,19 @@ function createMedia(dbDir, mediaUploadDir) {
   });
   const upload = multer({ storage });
 
-  const extractFilesMeta = (files = []) => {
-    /* eslint-disable no-param-reassign */
-    return files.reduce((result, file) => {
-      const newFieldValue = {
-        relativeSrc: `/${path.relative(dbDir, file.path)}`,
-        filename: file.filename,
-        size: file.size,
-        mimetype: file.mimetype,
-      };
-      if (typeof result[file.fieldname] !== "undefined") {
-        if (Array.isArray(result[file.fieldname])) {
-          result[file.fieldname] = [...result[file.fieldname], newFieldValue];
-        } else {
-          result[file.fieldname] = [result[file.fieldname], newFieldValue];
-        }
-      } else {
-        result[file.fieldname] = newFieldValue;
-      }
-      return result;
-    }, {});
+  const extractFileMeta = (file) => {
+    const fileMeta = {
+      relativeSrc: `/${path.relative(dbDir, file.path)}`,
+      filename: file.filename,
+      size: file.size,
+      mimetype: file.mimetype,
+    };
+    return fileMeta;
   };
 
   return {
     upload,
-    extractFilesMeta,
+    extractFileMeta,
   };
 }
 module.exports = (root, publicBaseUrl) => createMedia(root, publicBaseUrl);

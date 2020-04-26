@@ -6,7 +6,7 @@ const gitUtils = require("./git-utils");
 const media = require("./utils/media");
 
 module.exports = (dbDir, repositoryRoot, publicBaseUrl) => {
-  const { upload, extractFilesMeta, fileFieldsAppendSrc } = media(
+  const { upload, extractFileMeta, fileFieldsAppendSrc } = media(
     dbDir,
     publicBaseUrl,
   );
@@ -46,18 +46,19 @@ module.exports = (dbDir, repositoryRoot, publicBaseUrl) => {
 
   router.post("/", uploadMiddleware, async (req, res) => {
     const newId = uuidv4();
+    const [file] = req.files;
     const newMedia = {
-      ...extractFilesMeta(req.files).files,
+      ...extractFileMeta(file),
       id: newId,
     };
 
     const relativeItemPath = `content/media/${newId}.json`;
-    const itemPath = `${dbDir}/${relativeItemPath}`;
+    const metaFilePath = `${dbDir}/${relativeItemPath}`;
 
-    await utils.save(itemPath, newMedia);
+    await utils.save(metaFilePath, newMedia);
 
-    await gitUtils.commit([itemPath], repositoryRoot, {
-      message: `Flatlify created file: ${relativeItemPath}`,
+    await gitUtils.commit([metaFilePath, file.path], repositoryRoot, {
+      message: `Flatlify created files: ${relativeItemPath}, ${newMedia}`,
     });
 
     res.send(newMedia);
@@ -77,11 +78,13 @@ module.exports = (dbDir, repositoryRoot, publicBaseUrl) => {
 async function deleteItem(itemId, repositoryRoot, dbDir) {
   const relativeItemPath = `media/${itemId}.json`;
   const mediaPath = `${dbDir}/${relativeItemPath}`;
+  const [fileMetadata] = await utils.read(mediaPath);
+  const filePath = `${dbDir}/${fileMetadata.relativeSrc}`;
 
-  await utils.remove(mediaPath);
+  await Promise.all(utils.remove(mediaPath), utils.remove(filePath));
 
-  await gitUtils.commit([mediaPath], repositoryRoot, {
-    message: `Flatlify deleted file: ${relativeItemPath}`,
+  await gitUtils.commit([mediaPath, filePath], repositoryRoot, {
+    message: `Flatlify deleted files: ${relativeItemPath}, ${filePath}`,
     remove: true,
   });
 
