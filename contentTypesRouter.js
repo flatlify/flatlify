@@ -5,12 +5,8 @@ const { orderBy, slice } = require("lodash");
 const gitUtils = require("./git-utils");
 const utils = require("./utils/common");
 
-const { getContentType } = utils;
-
 module.exports = (dbDir, repositoryRoot) => {
   async function getMany(req, res) {
-    const contentType = getContentType(req);
-
     const pagination =
       req.query && req.query.pagination ? JSON.parse(req.query.pagination) : {};
     const sort = req.query && req.query.sort ? JSON.parse(req.query.sort) : {};
@@ -20,7 +16,7 @@ module.exports = (dbDir, repositoryRoot) => {
     const _order = sort.order || "ASC";
     const _sort = sort.field || "id";
 
-    const contentPath = path.resolve(dbDir, `${contentType}`);
+    const contentPath = path.resolve(dbDir, "content-types");
     const files = await utils.readCollectionList(contentPath);
     const items = slice(orderBy(files, [_sort], [_order]), _start, _end);
 
@@ -34,17 +30,14 @@ module.exports = (dbDir, repositoryRoot) => {
 
   async function getOne(req, res) {
     const { itemId } = req.params;
-    const contentType = getContentType(req);
 
-    const contentPath = path.resolve(dbDir, `${contentType}`, `${itemId}.json`);
+    const contentPath = path.resolve(dbDir, "content-types", `${itemId}.json`);
     const data = await utils.read(contentPath);
     res.send({ data });
   }
 
   async function createOne(req, res) {
-    const contentType = getContentType(req);
-
-    const contentPath = path.resolve(dbDir, `${contentType}`);
+    const contentPath = path.resolve(dbDir, "content-types");
     const items = await utils.readCollectionList(contentPath);
 
     const newId = utils.getNewIdFromDatabaseItems(items);
@@ -53,7 +46,7 @@ module.exports = (dbDir, repositoryRoot) => {
       ...req.body,
       id: newId,
     };
-    const relativeItemPath = `${contentType}/${newId}.json`;
+    const relativeItemPath = `content-types/${newId}.json`;
     const itemPath = `${dbDir}/${relativeItemPath}`;
     const newDirPath = path.resolve(dbDir, `${req.body.type.toLowerCase()}`);
 
@@ -102,22 +95,20 @@ module.exports = (dbDir, repositoryRoot) => {
   }
 
   async function updateOne(req, res) {
-    const contentType = getContentType(req);
     const { itemId } = req.params;
     const params = req.body;
 
-    const data = await update(itemId, contentType, params, repositoryRoot);
+    const data = await update(itemId, "content-types", params, repositoryRoot);
 
     res.status(200).send({ data });
   }
 
   async function updateMany(req, res) {
-    const contentType = getContentType(req);
     const params = req.body;
     const { ids } = req.query;
 
     const updatePromises = ids.map((id) =>
-      update(id, contentType, params, repositoryRoot),
+      update(id, "content-types", params, repositoryRoot),
     );
     await Promise.all(updatePromises);
 
@@ -145,20 +136,17 @@ module.exports = (dbDir, repositoryRoot) => {
 
   async function deleteOne(req, res) {
     const { itemId } = req.params;
-    const contentType = getContentType(req);
 
-    await deleteItem(dbDir, contentType, itemId, repositoryRoot);
+    await deleteItem(dbDir, "content-types", itemId, repositoryRoot);
 
     res.send({ data: {} });
   }
 
   async function deleteMany(req, res) {
-    const contentType = getContentType(req);
-
     const ids = req.body;
 
     const deletePromises = ids.map((id) =>
-      deleteItem(contentType, id, repositoryRoot),
+      deleteItem(dbDir, "content-types", id, repositoryRoot),
     );
     await Promise.all(deletePromises);
 
@@ -167,19 +155,19 @@ module.exports = (dbDir, repositoryRoot) => {
 
   const router = express.Router();
 
-  router.get("/:contentType", getMany);
+  router.get("/", getMany);
 
-  router.get("/:contentType/:itemId", getOne);
+  router.get("/:itemId", getOne);
 
-  router.put("/:contentType/:itemId", updateOne);
+  router.put("/:itemId", updateOne);
 
-  router.put("/:contentType", updateMany);
+  router.put("/", updateMany);
 
-  router.post("/:contentType", createOne);
+  router.post("/", createOne);
 
-  router.delete("/:contentType/:itemId", deleteOne);
+  router.delete("/:itemId", deleteOne);
 
-  router.delete("/:contentType", deleteMany);
+  router.delete("/", deleteMany);
 
   return router;
 };
