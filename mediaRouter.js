@@ -58,7 +58,7 @@ module.exports = (dbDir, repositoryRoot, publicBaseUrl) => {
     await utils.save(metaFilePath, newMedia);
 
     await gitUtils.commit([metaFilePath, file.path], repositoryRoot, {
-      message: `Flatlify created files: ${relativeItemPath}, ${newMedia}`,
+      message: `Flatlify created files: ${relativeItemPath}, ${newMedia.relativeSrc}`,
     });
 
     res.send(newMedia);
