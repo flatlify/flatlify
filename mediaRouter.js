@@ -72,21 +72,29 @@ module.exports = (dbDir, repositoryRoot, publicBaseUrl) => {
     res.send({ data: {} });
   });
 
+  router.delete("/", async (req, res) => {
+    const ids = req.body;
+    const deletePromises = ids.map((itemId) =>
+      deleteItem(itemId, repositoryRoot, dbDir),
+    );
+    await Promise.all(deletePromises);
+
+    res.send({ data: ids });
+  });
+
   return router;
 };
 
 async function deleteItem(itemId, repositoryRoot, dbDir) {
-  const relativeItemPath = `media/${itemId}.json`;
-  const mediaPath = `${dbDir}/${relativeItemPath}`;
-  const [fileMetadata] = await utils.read(mediaPath);
+  const relativeItemPath = `content/media/${itemId}.json`;
+  const metaFilePath = `${dbDir}/${relativeItemPath}`;
+  const fileMetadata = await utils.read(metaFilePath);
   const filePath = `${dbDir}/${fileMetadata.relativeSrc}`;
 
-  await Promise.all(utils.remove(mediaPath), utils.remove(filePath));
+  await Promise.all([utils.remove(metaFilePath), utils.remove(filePath)]);
 
-  await gitUtils.commit([mediaPath, filePath], repositoryRoot, {
+  await gitUtils.commit([metaFilePath, filePath], repositoryRoot, {
     message: `Flatlify deleted files: ${relativeItemPath}, ${filePath}`,
     remove: true,
   });
-
-  return {};
 }

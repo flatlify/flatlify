@@ -22,6 +22,6 @@ module.exports = {
     "no-console": ["error", { allow: ["warn", "error", "info"] }],
     "no-use-before-define": "off",
     "arrow-body-style": "off",
-    "no-use-before-define": "off",
+    "no-use-before-define": "off"
   },
 };
