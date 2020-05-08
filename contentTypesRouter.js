@@ -117,7 +117,7 @@ module.exports = (dbDir, repositoryRoot) => {
 
   async function deleteItem(root, contentType, itemId, repositoryRoot) {
     const relativeItemPath = `${contentType}/${itemId}.json`;
-    const contentItemPath = `${root}/${relativeItemPath}`;
+    const contentItemPath = `${root}/content/${relativeItemPath}`;
 
     const { type } = await utils.read(contentItemPath);
     const contentFolderPath = path.resolve(root, `${type.toLowerCase()}`);
