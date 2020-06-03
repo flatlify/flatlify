@@ -78,19 +78,8 @@ async function commit(
   return sha;
 }
 
-// git current branch
-
-async function branch(root) {
-  const branch = await isoGit.currentBranch({ dir: root, fullname: false });
-
-  return branch;
-}
-
-// git show content difference
-
 module.exports = {
   status,
-  branch,
   commit,
   checkout,
 };
