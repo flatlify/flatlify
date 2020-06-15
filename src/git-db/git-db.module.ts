@@ -1,15 +1,5 @@
 import { Module } from '@nestjs/common';
-import GitDB from '../../../gitdb/src/gitdb';
-import path from 'path';
+import { GitDbService } from './git-db.service';
 
-@Module({})
-export class GitDbModule {
-  private gitdb: GitDB;
-  constructor() {
-    this.gitdb = await GitDB.init({
-      autoCommit: false,
-      cache: false,
-      dbDir: path.join(__dirname, 'database'),
-    });
-  }
-}
+@Module({ imports: [GitDbModule], exports: [GitDbService] })
+export class GitDbModule {}
