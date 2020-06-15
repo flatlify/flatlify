@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import GitDB from '../../../gitdb/src/gitdb';
-import { Filter, SetCallback } from '../../../gitdb/src/collectionStrategy';
+import { GitDB, SetCallback } from 'gitdb';
 
 interface getManyParams {
   pagination?: {

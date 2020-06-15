@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import GitDB from '../../../gitdb/src/gitdb';
+import { GitDB, Filter, SetCallback } from 'gitdb';
 import path from 'path';
-import { Filter, SetCallback } from '../../../gitdb/src/collectionStrategy';
 
 @Injectable()
 export class GitDbService {
