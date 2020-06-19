@@ -15,7 +15,7 @@ import { IGetMany, IQueryIds } from './content.interfaces';
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
-  @Get(':contentType')
+  @Get('collections/:contentType')
   getMany(
     @Query() query: IGetMany,
     @Param('contentType') contentType: string,
@@ -27,7 +27,7 @@ export class ContentController {
     });
   }
 
-  @Get(':contentType/:id')
+  @Get('collections/:contentType/:id')
   getOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
@@ -36,7 +36,7 @@ export class ContentController {
     return this.contentService.getOne(contentType, id);
   }
 
-  @Put(':contentType')
+  @Put('collections/:contentType')
   updateMany(
     @Param('contentType') contentType: string,
     @Query() query: IQueryIds,
@@ -48,7 +48,7 @@ export class ContentController {
     }));
   }
 
-  @Put(':contentType/:id')
+  @Put('collections/:contentType/:id')
   updateOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
@@ -60,7 +60,7 @@ export class ContentController {
     }));
   }
 
-  @Post(':contentType')
+  @Post('collections/:contentType')
   createOne(
     @Param('contentType') contentType: string,
     @Body() data: any,
@@ -68,7 +68,7 @@ export class ContentController {
     return this.contentService.createOne(contentType, data);
   }
 
-  @Delete(':contentType')
+  @Delete('collections/:contentType')
   deleteMany(
     @Param('contentType') contentType: string,
     @Query() query: IQueryIds,
@@ -76,7 +76,7 @@ export class ContentController {
     return this.contentService.deleteMany(contentType, query.ids);
   }
 
-  @Delete(':contentType/:id')
+  @Delete('collections/:contentType/:id')
   deleteOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
