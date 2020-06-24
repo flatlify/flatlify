@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { GitDB, SetCallback } from 'gitdb';
+import { GitDBService } from 'src/git-db/git-db.service';
+import { SetCallback } from '@flatlify/gitdb';
 
 interface getManyParams {
   pagination?: {
@@ -15,7 +16,9 @@ interface getManyParams {
 
 @Injectable()
 export class ContentService {
-  constructor(@Inject('GitDB') private readonly gitDB: GitDB) {}
+  constructor(
+    @Inject('GitDBService') private readonly gitDBService: GitDBService,
+  ) {}
 
   async getMany(collectionName: string, params: getManyParams): Promise<any[]> {
     const {
@@ -26,10 +29,11 @@ export class ContentService {
 
     const start = page * perPage;
     const end = start + perPage;
-    const collection = await this.gitDB.get(collectionName);
     const data = ids
-      ? await collection.getData(document => ids.includes(document.id))
-      : await collection.getAll();
+      ? await this.gitDBService.getData(collectionName, document =>
+          ids.includes(document.id),
+        )
+      : await this.gitDBService.getAll(collectionName);
 
     return data.slice(start, end).sort((a, b) => {
       if (a[field] < b[field]) {
@@ -42,7 +46,7 @@ export class ContentService {
   }
 
   async getOne(collectionName: string, id: string): Promise<any> {
-    return this.gitDB.get(collectionName).getData(e => e.id === id);
+    return this.gitDBService.getData(collectionName, e => e.id === id);
   }
 
   updateMany(
@@ -50,9 +54,11 @@ export class ContentService {
     ids: string[],
     modifier: SetCallback<any>,
   ): Promise<any> {
-    return this.gitDB
-      .get(collectionName)
-      .update(document => ids.includes(document.id), modifier);
+    return this.gitDBService.update(
+      collectionName,
+      document => ids.includes(document.id),
+      modifier,
+    );
   }
 
   async updateOne(
@@ -60,24 +66,27 @@ export class ContentService {
     id: string,
     modifier: SetCallback<any>,
   ): Promise<any> {
-    return this.gitDB
-      .get(collectionName)
-      .update(document => document.id === id, modifier);
+    return this.gitDBService.update(
+      collectionName,
+      document => document.id === id,
+      modifier,
+    );
   }
 
   async createOne(collectionName: string, document: any): Promise<any> {
-    return this.gitDB.get(collectionName).insert(document);
+    return this.gitDBService.insert(collectionName, document);
   }
 
   async deleteOne(collectionName: string, id: string): Promise<any> {
-    return this.gitDB
-      .get(collectionName)
-      .delete(document => document.id === id);
+    return this.gitDBService.delete(
+      collectionName,
+      document => document.id === id,
+    );
   }
 
   async deleteMany(collectionName: string, ids: string[]): Promise<any[]> {
-    return this.gitDB
-      .get(collectionName)
-      .delete(document => ids.includes(document.id));
+    return this.gitDBService.delete(collectionName, document =>
+      ids.includes(document.id),
+    );
   }
 }

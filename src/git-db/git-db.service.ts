@@ -1,23 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { GitDB, Filter, SetCallback } from 'gitdb';
-import path from 'path';
+import { GitDB, Filter, SetCallback } from '@flatlify/gitdb';
+import * as path from 'path';
 
 @Injectable()
-export class GitDbService {
+export class GitDBService {
   private gitdb: GitDB;
   constructor() {
-    this.gitdb = new GitDB({
+    const da = __dirname;
+    const config = {
       autoCommit: false,
       cache: false,
-      dbDir: path.join(__dirname, 'database'),
-    });
-  }
-  public async init(): Promise<void> {
-    await this.gitdb.init();
+      dbDir: path.resolve(da, 'database'),
+    };
+    this.gitdb = new GitDB(config);
   }
 
-  public async createCollection(collectionName: string): Promise<void> {
-    await this.gitdb.createCollection(collectionName);
+  public list(): string[] {
+    return this.gitdb.list();
+  }
+
+  public async init(): Promise<void> {
+    return this.gitdb.init();
+  }
+
+  public async createCollection(collectionName: string): Promise<string> {
+    return this.gitdb.createCollection(collectionName);
+  }
+
+  public async deleteCollection(collectionName: string): Promise<string> {
+    return this.gitdb.delete(collectionName);
   }
 
   public async getAll(collectionName: string): Promise<any[]> {

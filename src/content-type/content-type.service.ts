@@ -1,19 +1,21 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { GitDB } from 'gitdb';
+import { GitDBService } from 'src/git-db/git-db.service';
 
 @Injectable()
 export class ContentTypeService {
-  constructor(@Inject('GitDB') private readonly gitDB: GitDB) {}
+  constructor(
+    @Inject('GitDBService') private readonly gitDBService: GitDBService,
+  ) {}
 
   async getList(): Promise<any[]> {
-    return this.gitDB.list();
+    return this.gitDBService.list();
   }
 
   async create(collectionName: string): Promise<any> {
-    return this.gitDB.createCollection(collectionName);
+    return this.gitDBService.createCollection(collectionName);
   }
 
   async delete(collectionName: string): Promise<any> {
-    return this.gitDB.delete(collectionName);
+    return this.gitDBService.deleteCollection(collectionName);
   }
 }

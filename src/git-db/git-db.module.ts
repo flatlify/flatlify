@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
-import { GitDbService } from './git-db.service';
+import { GitDBService } from './git-db.service';
 
-@Module({ imports: [GitDbModule], exports: [GitDbService] })
-export class GitDbModule {}
+@Module({
+  providers: [GitDBService],
+  exports: [GitDBService],
+})
+export class GitDBModule {}

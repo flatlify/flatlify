@@ -4,12 +4,12 @@ import { AppService } from './app.service';
 import { MediaModule } from './media/media.module';
 import { ContentModule } from './content/content.module';
 import { ContentTypeModule } from './content-type/content-type.module';
-import { GitDbService } from './git-db/git-db.service';
-import { GitDbModule } from './git-db/git-db.module';
+import { GitDBService } from './git-db/git-db.service';
+import { GitDBModule } from './git-db/git-db.module';
 
 @Module({
-  imports: [MediaModule, ContentModule, ContentTypeModule, GitDbModule],
+  imports: [GitDBModule, ContentModule, MediaModule, ContentTypeModule],
   controllers: [AppController],
-  providers: [AppService, GitDbService],
+  providers: [GitDBService, AppService],
 })
 export class AppModule {}
