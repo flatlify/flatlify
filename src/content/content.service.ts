@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { GitDBService } from 'src/git-db/git-db.service';
+import { GitDBService } from '../git-db/git-db.service';
 import { SetCallback } from '@flatlify/gitdb';
 
 interface getManyParams {

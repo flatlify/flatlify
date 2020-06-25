@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { GitDBService } from 'src/git-db/git-db.service';
+import { GitDBService } from '../git-db/git-db.service';
 
 @Injectable()
 export class ContentTypeService {
@@ -7,7 +7,7 @@ export class ContentTypeService {
     @Inject('GitDBService') private readonly gitDBService: GitDBService,
   ) {}
 
-  async getList(): Promise<any[]> {
+  async list(): Promise<any[]> {
     return this.gitDBService.list();
   }
 

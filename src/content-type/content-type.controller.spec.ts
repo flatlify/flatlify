@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContentTypeController } from './content-type.controller';
+import { ContentTypeService } from './content-type.service';
+import { GitDBService } from '../git-db/git-db.service';
 
 describe('ContentType Controller', () => {
   let controller: ContentTypeController;
@@ -7,6 +9,7 @@ describe('ContentType Controller', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ContentTypeController],
+      providers: [ContentTypeService, GitDBService],
     }).compile();
 
     controller = module.get<ContentTypeController>(ContentTypeController);

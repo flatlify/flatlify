@@ -6,11 +6,10 @@ import * as path from 'path';
 export class GitDBService {
   private gitdb: GitDB;
   constructor() {
-    const da = __dirname;
     const config = {
       autoCommit: false,
       cache: false,
-      dbDir: path.resolve(da, 'database'),
+      dbDir: path.resolve(__dirname, 'database'),
     };
     this.gitdb = new GitDB(config);
   }

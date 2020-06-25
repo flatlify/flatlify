@@ -7,7 +7,7 @@ export class ContentTypeController {
 
   @Get('collections')
   list(): Promise<any[]> {
-    return this.contentTypeService.getList();
+    return this.contentTypeService.list();
   }
 
   @Post('collections/:contentType')
