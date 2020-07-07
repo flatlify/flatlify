@@ -4,8 +4,8 @@ import { SetCallback } from '@flatlify/gitdb';
 
 interface getManyParams {
   pagination?: {
-    perPage?: number;
-    page?: number;
+    start?: number;
+    limit?: number;
   };
   sort?: {
     order?: string;
@@ -22,20 +22,18 @@ export class ContentService {
 
   async getMany(collectionName: string, params: getManyParams): Promise<any[]> {
     const {
-      pagination: { page = 0, perPage = 25 } = {},
+      pagination: { start = 0, limit = 25 } = {},
       sort: { order = 'ASC', field = 'id' } = {},
       ids,
     } = params;
 
-    const start = page * perPage;
-    const end = start + perPage;
     const data = ids
       ? await this.gitDBService.getData(collectionName, document =>
           ids.includes(document.id),
         )
       : await this.gitDBService.getAll(collectionName);
 
-    return data.slice(start, end).sort((a, b) => {
+    return data.slice(start, start + limit).sort((a, b) => {
       if (a[field] < b[field]) {
       }
       if (a[field] > b[field]) {
