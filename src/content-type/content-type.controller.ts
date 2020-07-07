@@ -11,7 +11,7 @@ export class ContentTypeController {
   }
 
   @Post('collections/:contentType')
-  createOne(@Query('contentType') contentType: string): Promise<any> {
+  createOne(@Param('contentType') contentType: string): Promise<any> {
     return this.contentTypeService.create(contentType);
   }
 
