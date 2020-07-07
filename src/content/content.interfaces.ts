@@ -1,6 +1,6 @@
 export interface IGetMany {
-  page?: number;
-  perPage?: number;
+  limit?: number;
+  start?: number;
   order?: string;
   field?: string;
   ids?: string[];

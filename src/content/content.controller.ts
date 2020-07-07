@@ -21,7 +21,7 @@ export class ContentController {
     @Param('contentType') contentType: string,
   ): Promise<any[]> {
     return this.contentService.getMany(contentType, {
-      pagination: { page: query.page, perPage: query.perPage },
+      pagination: { limit: query.limit, start: query.start },
       sort: { order: query.order, field: query.field },
       ids: query.ids,
     });
