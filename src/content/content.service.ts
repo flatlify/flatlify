@@ -11,7 +11,7 @@ interface getManyParams {
     order?: string;
     field?: string;
   };
-  ids: string[];
+  ids?: string[];
 }
 
 @Injectable()
@@ -22,8 +22,8 @@ export class ContentService {
 
   async getMany(collectionName: string, params: getManyParams): Promise<any[]> {
     const {
-      pagination: { page = 0, perPage = 25 },
-      sort: { order = 'ASC', field = 'id' },
+      pagination: { page = 0, perPage = 25 } = {},
+      sort: { order = 'ASC', field = 'id' } = {},
       ids,
     } = params;
 
@@ -46,7 +46,11 @@ export class ContentService {
   }
 
   async getOne(collectionName: string, id: string): Promise<any> {
-    return this.gitDBService.getData(collectionName, e => e.id === id);
+    const result = await this.gitDBService.getData(
+      collectionName,
+      e => e.id === id,
+    );
+    return result[0];
   }
 
   updateMany(
@@ -78,10 +82,11 @@ export class ContentService {
   }
 
   async deleteOne(collectionName: string, id: string): Promise<any> {
-    return this.gitDBService.delete(
+    const result = await this.gitDBService.delete(
       collectionName,
       document => document.id === id,
     );
+    return result[0];
   }
 
   async deleteMany(collectionName: string, ids: string[]): Promise<any[]> {
