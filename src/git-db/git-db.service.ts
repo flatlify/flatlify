@@ -10,7 +10,6 @@ export class GitDBService {
   constructor(
     @Inject('ConfigService') private readonly configService: ConfigService,
   ) {
-    console.log(configService.get('ENV_VARIABLE'), process.env);
     const config = {
       autoCommit: false,
       cache: false,
