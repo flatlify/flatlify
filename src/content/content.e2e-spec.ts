@@ -1,4 +1,5 @@
 import * as request from 'supertest';
+import { exec } from 'child_process';
 import { equal } from 'assert';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
@@ -22,6 +23,9 @@ describe('Cats', () => {
 
   afterAll(async () => {
     await app.close();
+    // TODO: use env variables for this
+    // const dbFolder = ?
+    // exec(`rm -rf ${dbFolder}`)
   });
 
   it(`can create document inside collection`, async () => {

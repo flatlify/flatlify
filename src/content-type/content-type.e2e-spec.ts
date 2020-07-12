@@ -17,6 +17,9 @@ describe('Cats', () => {
 
   afterAll(async () => {
     await app.close();
+    // TODO: use env variables for this
+    // const dbFolder = ?
+    // exec(`rm -rf ${dbFolder}`)
   });
 
   it(`can create and delete collection`, async () => {
