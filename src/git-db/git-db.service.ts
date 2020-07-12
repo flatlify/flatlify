@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { GitDB, Filter, SetCallback } from '@flatlify/gitdb';
+import { ConfigService } from '@nestjs/config';
+
 import * as path from 'path';
 
 @Injectable()
 export class GitDBService {
   private gitdb: GitDB;
-  constructor() {
+  constructor(
+    @Inject('ConfigService') private readonly configService: ConfigService,
+  ) {
+    console.log(configService.get('ENV_VARIABLE'), process.env);
     const config = {
       autoCommit: false,
       cache: false,
