@@ -15,32 +15,50 @@ describe('Cats', () => {
     await app.init();
   });
 
-  it(`can create collection`, () => {
-    request(app.getHttpServer())
-      .post('/content-type/collections/new-content-type')
-      .send({})
-      .expect(201);
+  afterAll(async () => {
+    await app.close();
   });
 
-  it(`can delete created collection`, async () => {
+  it(`can create and delete collection`, async () => {
     await request(app.getHttpServer())
       .post('/content-type/collections/new-content-type')
-      .send({});
+      .expect(201);
 
     await request(app.getHttpServer())
       .delete('/content-type/collections/new-content-type')
-      .send({})
       .expect(200);
   });
 
-  it(`list works properly`, async () => {
-    await request(app.getHttpServer())
-      .post('/content-type/collections/new-content-type-one')
-      .send({});
+  it(`should fail if attempted to create collection which already exists`, async () => {
+    try {
+      await request(app.getHttpServer()).post(
+        '/content-type/collections/new-content-type',
+      );
 
+      await request(app.getHttpServer())
+        .post('/content-type/collections/new-content-type')
+        .expect(409);
+    } finally {
+      await request(app.getHttpServer()).delete(
+        '/content-type/collections/new-content-type',
+      );
+    }
+  });
+
+  it(`should fail if attempted to delete non existing collection`, async () => {
     await request(app.getHttpServer())
-      .post('/content-type/collections/new-content-type-two')
-      .send({});
+      .delete('/content-type/collections/new-content-type')
+      .expect(404);
+  });
+
+  it(`list works properly`, async () => {
+    await request(app.getHttpServer()).post(
+      '/content-type/collections/new-content-type-one',
+    );
+
+    await request(app.getHttpServer()).post(
+      '/content-type/collections/new-content-type-two',
+    );
 
     await request(app.getHttpServer())
       .get('/content-type/collections')
@@ -48,7 +66,18 @@ describe('Cats', () => {
       .expect(['new-content-type-one', 'new-content-type-two']);
   });
 
-  afterAll(async () => {
-    await app.close();
+  it(`list works properly`, async () => {
+    await request(app.getHttpServer()).post(
+      '/content-type/collections/new-content-type-one',
+    );
+
+    await request(app.getHttpServer()).post(
+      '/content-type/collections/new-content-type-two',
+    );
+
+    await request(app.getHttpServer())
+      .get('/content-type/collections')
+      .expect(200)
+      .expect(['new-content-type-one', 'new-content-type-two']);
   });
 });

@@ -1,5 +1,5 @@
 {
-  "name": "@flatlify/flatlify-next",
+  "name": "@flatlify/flatlify",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -17,9 +17,12 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./jest-e2e.json",
-    "test:e2eContainer": "docker build -t flatlify-tests . && sudo docker run flatlify-tests"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2eContainer:build": "docker build -t flatlify-image .",
+    "test:e2eContainer:start": "sudo docker run --name flatlify-tests -idt -v $(pwd):/app flatlify-image",
+    "test:e2eContainer:stop": "docker stop flatlify-tests",
+    "docker:test:e2e": "docker exec -it flatlify-tests npm run test:e2e"
   },
   "dependencies": {
     "@flatlify/gitdb": "^0.1.5",

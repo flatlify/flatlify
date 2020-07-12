@@ -8,4 +8,5 @@ export interface IGetMany {
 
 export interface IQueryIds {
   ids: string[];
+  data: any;
 }

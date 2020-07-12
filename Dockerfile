@@ -1,20 +1,21 @@
 FROM node:12
 
 # Create app directory
-WORKDIR /src
+WORKDIR /app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-COPY package*.json .npmrc ./
+COPY package*.json .npmrc /app/
 
 RUN npm install
 # If you are building your code for production
 # RUN npm ci --only=production
 
 # Bundle app source
-COPY . .
+COPY . /app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "test:e2e"]
+CMD tail -f /dev/null
+# run --name flatlify-tests -idt flatlify-image

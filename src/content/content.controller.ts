@@ -9,7 +9,7 @@ import {
   Body,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
-import { IGetMany, IQueryIds } from './content.interfaces';
+import { IGetMany, IQueryIds as IBodyIds } from './content.interfaces';
 
 @Controller('content')
 export class ContentController {
@@ -31,7 +31,6 @@ export class ContentController {
   getOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
-    @Body() data: any,
   ): Promise<any> {
     return this.contentService.getOne(contentType, id);
   }
@@ -39,12 +38,11 @@ export class ContentController {
   @Put('collections/:contentType')
   updateMany(
     @Param('contentType') contentType: string,
-    @Query() query: IQueryIds,
-    @Body() data: any,
+    @Body() body: IBodyIds,
   ): Promise<any[]> {
-    return this.contentService.updateMany(contentType, query.ids, document => ({
+    return this.contentService.updateMany(contentType, body.ids, document => ({
       ...document,
-      ...data,
+      ...body.data,
     }));
   }
 
@@ -71,9 +69,9 @@ export class ContentController {
   @Delete('collections/:contentType')
   deleteMany(
     @Param('contentType') contentType: string,
-    @Query() query: IQueryIds,
+    @Body() body: IBodyIds,
   ): Promise<any[]> {
-    return this.contentService.deleteMany(contentType, query.ids);
+    return this.contentService.deleteMany(contentType, body.ids);
   }
 
   @Delete('collections/:contentType/:id')
