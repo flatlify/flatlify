@@ -5,7 +5,6 @@ import { ContentTypeService } from '../content-type/content-type.service';
 
 describe('ContentService', () => {
   let contentService: ContentService;
-  let contentTypeService: ContentTypeService;
   let gitDBService: GitDBService;
 
   beforeEach(async () => {
@@ -14,7 +13,6 @@ describe('ContentService', () => {
     }).compile();
 
     contentService = module.get<ContentService>(ContentService);
-    contentTypeService = module.get<ContentTypeService>(ContentTypeService);
     gitDBService = module.get<GitDBService>(GitDBService);
   });
 
@@ -89,41 +87,6 @@ describe('ContentService', () => {
     await contentService.getOne('collection', '3');
 
     expect(testResult).toStrictEqual({ id: '3' });
-  });
-
-  it('should call gitDb updateMany', async () => {
-    const testObject = { id: '1' };
-    const modifier = e => e;
-    jest
-      .spyOn(gitDBService, 'update')
-      .mockImplementation(async () => [testObject]);
-    const returnedValue = await contentService.updateMany(
-      'collection',
-      ['1'],
-      modifier,
-    );
-
-    expect(gitDBService.update).toBeCalledWith(
-      'collection',
-      expect.any(Function),
-      modifier,
-    );
-    expect(returnedValue).toStrictEqual([testObject]);
-  });
-
-  it('should create correct filter function in updateMany', async () => {
-    let testResult;
-    const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
-
-    jest
-      .spyOn(gitDBService, 'update')
-      .mockImplementation(async (collectionName, func) => {
-        testResult = testArray.filter(func);
-        return [];
-      });
-    await contentService.updateMany('collection', ['3', '4'], e => e);
-
-    expect(testResult).toStrictEqual([{ id: '3' }, { id: '4' }]);
   });
 
   it('should call gitDb updateOne', async () => {
@@ -201,33 +164,5 @@ describe('ContentService', () => {
     await contentService.deleteOne('collection', '1');
 
     expect(testResult).toStrictEqual([{ id: '1' }]);
-  });
-
-  it('should call gitDb deleteMany', async () => {
-    const testObject = { id: '1' };
-    jest
-      .spyOn(gitDBService, 'delete')
-      .mockImplementation(async () => [testObject]);
-    const returnedValue = await contentService.deleteMany('collection', ['1']);
-
-    expect(gitDBService.delete).toBeCalledWith(
-      'collection',
-      expect.any(Function),
-    );
-    expect(returnedValue).toStrictEqual([testObject]);
-  });
-
-  it('should create correct filter function in deleteMany', async () => {
-    let testResult;
-    const testArray = [{ id: '1' }, { id: '4' }, { id: '3' }];
-    jest
-      .spyOn(gitDBService, 'delete')
-      .mockImplementation(async (collectionName, func) => {
-        testResult = testArray.filter(func);
-        return [];
-      });
-    await contentService.deleteMany('collection', ['1', '3']);
-
-    expect(testResult).toStrictEqual([{ id: '1' }, { id: '3' }]);
   });
 });

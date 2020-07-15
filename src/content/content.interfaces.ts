@@ -5,8 +5,3 @@ export interface IGetMany {
   field?: string;
   ids?: string[];
 }
-
-export interface IQueryIds {
-  ids: string[];
-  data: any;
-}

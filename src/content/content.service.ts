@@ -51,18 +51,6 @@ export class ContentService {
     return result[0];
   }
 
-  updateMany(
-    collectionName: string,
-    ids: string[],
-    modifier: SetCallback<any>,
-  ): Promise<any> {
-    return this.gitDBService.update(
-      collectionName,
-      document => ids.includes(document.id),
-      modifier,
-    );
-  }
-
   async updateOne(
     collectionName: string,
     id: string,
@@ -85,11 +73,5 @@ export class ContentService {
       document => document.id === id,
     );
     return result[0];
-  }
-
-  async deleteMany(collectionName: string, ids: string[]): Promise<any[]> {
-    return this.gitDBService.delete(collectionName, document =>
-      ids.includes(document.id),
-    );
   }
 }

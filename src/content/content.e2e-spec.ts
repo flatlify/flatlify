@@ -57,28 +57,6 @@ describe('Cats', () => {
       .expect(404);
   });
 
-  it(`can delete multiple documents`, async () => {
-    const documentOne = await request(app.getHttpServer()).post(
-      '/content/collections/test-content-type',
-    );
-
-    const documentTwo = await request(app.getHttpServer()).post(
-      '/content/collections/test-content-type',
-    );
-
-    await request(app.getHttpServer())
-      .delete(`/content/collections/test-content-type`)
-      .send({ ids: [documentOne, documentTwo] })
-      .expect(200);
-  });
-
-  it(`cannot delete non existing documents`, async () => {
-    await request(app.getHttpServer())
-      .delete(`/content/collections/test-content-type`)
-      .send({ ids: ['random id', 'random id 2'] })
-      .expect(404);
-  });
-
   it(`can get multiple documents`, async () => {
     const documentOne = await request(app.getHttpServer())
       .post('/content/collections/test-content-type')
@@ -113,18 +91,6 @@ describe('Cats', () => {
       .expect(404);
   });
 
-  it(`handle mix of existing & non existing documents`, async () => {
-    const document = await request(app.getHttpServer())
-      .post('/content/collections/test-content-type')
-      .send({ info: 'info' });
-
-    // ? what data or code should server return
-    await request(app.getHttpServer())
-      .get(`/content/collections/test-content-type`)
-      .query({ ids: [document.body.id, 'random-id'] })
-      .expect(404);
-  });
-
   it(`can update document`, async () => {
     const document = await request(app.getHttpServer())
       .post('/content/collections/test-content-type')
@@ -153,34 +119,5 @@ describe('Cats', () => {
     await request(app.getHttpServer())
       .get(`/content/collections/test-content-type/${document.body.id}`)
       .expect({ id: document.body.id, info: 'new info', newField: 'newField' });
-  });
-
-  it(`can update multiple documents`, async () => {
-    const documentOne = await request(app.getHttpServer())
-      .post('/content/collections/test-content-type')
-      .send({ info: 'info' });
-
-    const documentTwo = await request(app.getHttpServer())
-      .post('/content/collections/test-content-type')
-      .send({ info: 'info' });
-
-    const documentOneId = documentOne.body.id;
-    const documentTwoId = documentTwo.body.id;
-
-    await request(app.getHttpServer())
-      .put(`/content/collections/test-content-type`)
-      .send({
-        ids: [documentOneId, documentTwoId],
-        data: { info: 'new info', newField: 'newField' },
-      })
-      .expect(200);
-
-    await request(app.getHttpServer())
-      .get(`/content/collections/test-content-type`)
-      .query({ ids: [documentOneId, documentTwoId] })
-      .expect([
-        { id: documentOneId, info: 'new info', newField: 'newField' },
-        { id: documentTwoId, info: 'new info', newField: 'newField' },
-      ]);
   });
 });
