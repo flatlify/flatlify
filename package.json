@@ -20,7 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./jest-e2e.json",
     "docker:build": "docker build -t flatlify-image .",
-    "docker:run": "docker run --name flatlify-tests -idt -v $(pwd):/app flatlify-image",
+    "docker:run": "docker run -e AUTO_COMMIT=true -e CACHE=true -e DB_DIR=/app/database --name flatlify-tests -idt -v $(pwd):/app flatlify-image",
     "docker:e2e": "docker exec -it flatlify-tests npm run test:e2e",
     "docker:start": "docker start flatlify-tests",
     "docker:stop": "docker stop flatlify-tests",
@@ -32,6 +32,7 @@
     "@nestjs/config": "^0.5.0",
     "@nestjs/core": "^7.2.0",
     "@nestjs/platform-express": "^7.2.0",
+    "dotenv": "^8.2.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4"

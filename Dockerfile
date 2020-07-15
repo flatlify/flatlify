@@ -18,4 +18,3 @@ COPY . /app
 EXPOSE 3000
 
 CMD tail -f /dev/null
-# run --name flatlify-tests -idt flatlify-image

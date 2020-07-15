@@ -10,10 +10,14 @@ export class GitDBService {
   constructor(
     @Inject('ConfigService') private readonly configService: ConfigService,
   ) {
+    const autoCommit = configService.get('AUTO_COMMIT') === 'true';
+    const cache = configService.get('CACHE') === 'true';
+    const dbDir = configService.get('DB_DIR');
+
     const config = {
-      autoCommit: false,
-      cache: false,
-      dbDir: path.resolve(__dirname, 'database'),
+      autoCommit,
+      cache,
+      dbDir,
     };
     this.gitdb = new GitDB(config);
   }

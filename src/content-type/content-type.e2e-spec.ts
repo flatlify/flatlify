@@ -1,84 +1,66 @@
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import { ContentTypeModule } from './content-type.module';
+import { exec } from 'child_process';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+const { DB_DIR, PORT } = process.env;
+process.env.DB_DIR = `${__dirname}/database`;
+const URL = `localhost:${PORT}`;
 
 describe('Cats', () => {
-  let app: INestApplication;
-
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [ContentTypeModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-    await app.init();
+    exec(`mkdir -p ${DB_DIR}`);
   });
 
   afterAll(async () => {
-    await app.close();
-    // TODO: use env variables for this
-    // const dbFolder = ?
-    // exec(`rm -rf ${dbFolder}`)
+    exec(`rm -rf ${DB_DIR}`);
   });
 
   it(`can create and delete collection`, async () => {
-    await request(app.getHttpServer())
+    await request(URL)
       .post('/content-type/collections/new-content-type')
       .expect(201);
 
-    await request(app.getHttpServer())
+    await request(URL)
       .delete('/content-type/collections/new-content-type')
       .expect(200);
   });
 
   it(`should fail if attempted to create collection which already exists`, async () => {
     try {
-      await request(app.getHttpServer()).post(
-        '/content-type/collections/new-content-type',
-      );
+      await request(URL).post('/content-type/collections/new-content-type');
 
-      await request(app.getHttpServer())
+      await request(URL)
         .post('/content-type/collections/new-content-type')
         .expect(409);
     } finally {
-      await request(app.getHttpServer()).delete(
-        '/content-type/collections/new-content-type',
-      );
+      await request(URL).delete('/content-type/collections/new-content-type');
     }
   });
 
   it(`should fail if attempted to delete non existing collection`, async () => {
-    await request(app.getHttpServer())
+    await request(URL)
       .delete('/content-type/collections/new-content-type')
       .expect(404);
   });
 
   it(`list works properly`, async () => {
-    await request(app.getHttpServer()).post(
-      '/content-type/collections/new-content-type-one',
-    );
+    await request(URL).post('/content-type/collections/new-content-type-one');
 
-    await request(app.getHttpServer()).post(
-      '/content-type/collections/new-content-type-two',
-    );
+    await request(URL).post('/content-type/collections/new-content-type-two');
 
-    await request(app.getHttpServer())
+    await request(URL)
       .get('/content-type/collections')
       .expect(200)
       .expect(['new-content-type-one', 'new-content-type-two']);
   });
 
   it(`list works properly`, async () => {
-    await request(app.getHttpServer()).post(
-      '/content-type/collections/new-content-type-one',
-    );
+    await request(URL).post('/content-type/collections/new-content-type-one');
 
-    await request(app.getHttpServer()).post(
-      '/content-type/collections/new-content-type-two',
-    );
+    await request(URL).post('/content-type/collections/new-content-type-two');
 
-    await request(app.getHttpServer())
+    await request(URL)
       .get('/content-type/collections')
       .expect(200)
       .expect(['new-content-type-one', 'new-content-type-two']);
