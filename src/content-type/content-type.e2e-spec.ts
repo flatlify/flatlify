@@ -1,19 +1,19 @@
 import * as request from 'supertest';
-import {  execSync } from 'child_process';
 import * as dotenv from 'dotenv';
+import * as fse from 'fs-extra';
 
 dotenv.config();
 const { DB_DIR, PORT } = process.env;
 process.env.DB_DIR = `${__dirname}/database`;
 const URL = `localhost:${PORT}`;
 
-describe('Cats', () => {
+describe('Content type', () => {
   beforeAll(async () => {
-    execSync(`mkdir -p ${DB_DIR}`);
+    await fse.ensureDir(DB_DIR);
   });
 
   afterAll(async () => {
-    execSync(`rm -rf ${DB_DIR}`);
+    await fse.remove(DB_DIR);
   });
 
   it(`can create and delete collection`, async () => {
