@@ -16,5 +16,5 @@ RUN npm install
 COPY . /app
 
 EXPOSE 3000
-
-CMD tail -f /dev/null
+# 
+CMD ["npm", "start"]
