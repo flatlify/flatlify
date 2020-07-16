@@ -11,7 +11,7 @@ interface getManyParams {
     order?: string;
     field?: string;
   };
-  ids?: string[];
+  id?: string[];
 }
 
 @Injectable()
@@ -24,12 +24,12 @@ export class ContentService {
     const {
       pagination: { start = 0, limit = 25 } = {},
       sort: { order = 'ASC', field = 'id' } = {},
-      ids,
+      id,
     } = params;
 
-    const data = ids
+    const data = id
       ? await this.gitDBService.getData(collectionName, document =>
-          ids.includes(document.id),
+          id.includes(document.id),
         )
       : await this.gitDBService.getAll(collectionName);
 
@@ -51,27 +51,39 @@ export class ContentService {
     return result[0];
   }
 
-  async updateOne(
+  async update(
     collectionName: string,
     id: string,
     modifier: SetCallback<any>,
   ): Promise<any> {
-    return this.gitDBService.update(
+    const updatedDocuments = await this.gitDBService.update(
       collectionName,
-      document => document.id === id,
+      document => {
+        return document.id === id;
+      },
       modifier,
     );
+    if (!updatedDocuments.length) {
+      throw { msg: 'File not found' };
+    }
+    return updatedDocuments[0];
   }
 
-  async createOne(collectionName: string, document: any): Promise<any> {
+  async create(
+    collectionName: string,
+    document: Record<string, unknown>,
+  ): Promise<any> {
     return this.gitDBService.insert(collectionName, document);
   }
 
-  async deleteOne(collectionName: string, id: string): Promise<any> {
-    const result = await this.gitDBService.delete(
+  async delete(collectionName: string, id: string): Promise<any> {
+    const deletedDocuments = await this.gitDBService.delete(
       collectionName,
       document => document.id === id,
     );
-    return result[0];
+    if (!deletedDocuments.length) {
+      throw { msg: 'File not found' };
+    }
+    return deletedDocuments[0];
   }
 }

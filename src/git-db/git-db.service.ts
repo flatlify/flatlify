@@ -2,8 +2,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import { GitDB, Filter, SetCallback } from '@flatlify/gitdb';
 import { ConfigService } from '@nestjs/config';
 
-import * as path from 'path';
-
 @Injectable()
 export class GitDBService {
   private gitdb: GitDB;
@@ -31,7 +29,8 @@ export class GitDBService {
   }
 
   public async createCollection(collectionName: string): Promise<string> {
-    return this.gitdb.createCollection(collectionName);
+    const collection = await this.gitdb.createCollection(collectionName);
+    return collection;
   }
 
   public async deleteCollection(collectionName: string): Promise<string> {
@@ -49,7 +48,10 @@ export class GitDBService {
     return this.gitdb.get(collectionName).getData(callback);
   }
 
-  public async insert(collectionName: string, documentData: any): Promise<any> {
+  public async insert(
+    collectionName: string,
+    documentData: Record<string, unknown>,
+  ): Promise<any> {
     return this.gitdb.get(collectionName).insert(documentData);
   }
 

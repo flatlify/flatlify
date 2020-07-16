@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import { exec } from 'child_process';
+import {  execSync } from 'child_process';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -9,11 +9,11 @@ const URL = `localhost:${PORT}`;
 
 describe('Cats', () => {
   beforeAll(async () => {
-    exec(`mkdir -p ${DB_DIR}`);
+    execSync(`mkdir -p ${DB_DIR}`);
   });
 
   afterAll(async () => {
-    exec(`rm -rf ${DB_DIR}`);
+    execSync(`rm -rf ${DB_DIR}`);
   });
 
   it(`can create and delete collection`, async () => {

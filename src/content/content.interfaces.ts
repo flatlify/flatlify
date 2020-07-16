@@ -3,5 +3,5 @@ export interface IGetMany {
   start?: number;
   order?: string;
   field?: string;
-  ids?: string[];
+  id?: string[];
 }

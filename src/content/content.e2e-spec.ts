@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 import * as dotenv from 'dotenv';
 import { equal } from 'assert';
 
@@ -10,11 +10,17 @@ const URL = `localhost:${PORT}`;
 
 describe('Cats', () => {
   beforeAll(async () => {
-    exec(`mkdir -p ${DB_DIR}`);
+    execSync(`mkdir -p ${DB_DIR}`);
+    await request(URL)
+      .post('/content-type/collections/test-content-type')
+      .send({});
   });
 
   afterAll(async () => {
-    exec(`rm -rf ${DB_DIR}`);
+    await request(URL)
+      .delete('/content-type/collections/test-content-type')
+      .send({});
+    execSync(`rm -rf ${DB_DIR}`);
   });
 
   it(`can create document inside collection`, async () => {
@@ -26,10 +32,6 @@ describe('Cats', () => {
   });
 
   it(`can create and delete document inside collection`, async () => {
-    await request(URL)
-      .post('/content-type/collections/test-content-type')
-      .send({});
-
     const data = await request(URL)
       .post('/content/collections/test-content-type')
       .send({ info: 'info' })

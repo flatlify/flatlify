@@ -95,7 +95,7 @@ describe('ContentService', () => {
     jest
       .spyOn(gitDBService, 'update')
       .mockImplementation(async () => [testObject]);
-    const returnedValue = await contentService.updateOne(
+    const returnedValue = await contentService.update(
       'collection',
       '1',
       modifier,
@@ -119,7 +119,7 @@ describe('ContentService', () => {
         testResult = testArray.filter(func);
         return [];
       });
-    await contentService.updateOne('collection', '4', e => e);
+    await contentService.update('collection', '4', e => e);
 
     expect(testResult).toStrictEqual([{ id: '4' }]);
   });
@@ -129,7 +129,7 @@ describe('ContentService', () => {
     jest
       .spyOn(gitDBService, 'insert')
       .mockImplementation(async () => testObject);
-    const returnedValue = await contentService.createOne(
+    const returnedValue = await contentService.create(
       'collection',
       testObject,
     );
@@ -143,7 +143,7 @@ describe('ContentService', () => {
     jest
       .spyOn(gitDBService, 'delete')
       .mockImplementation(async () => [testObject]);
-    const returnedValue = await contentService.deleteOne('collection', '1');
+    const returnedValue = await contentService.delete('collection', '1');
 
     expect(gitDBService.delete).toBeCalledWith(
       'collection',
@@ -161,7 +161,7 @@ describe('ContentService', () => {
         testResult = testArray.filter(func);
         return [];
       });
-    await contentService.deleteOne('collection', '1');
+    await contentService.delete('collection', '1');
 
     expect(testResult).toStrictEqual([{ id: '1' }]);
   });

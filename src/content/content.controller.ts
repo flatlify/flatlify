@@ -7,6 +7,8 @@ import {
   Query,
   Param,
   Body,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { IGetMany } from './content.interfaces';
@@ -23,43 +25,87 @@ export class ContentController {
     return this.contentService.getMany(contentType, {
       pagination: { limit: query.limit, start: query.start },
       sort: { order: query.order, field: query.field },
-      ids: query.ids,
+      id: query.id,
     });
   }
 
   @Get('collections/:contentType/:id')
-  getOne(
+  async getOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
   ): Promise<any> {
-    return this.contentService.getOne(contentType, id);
+    const document = await this.contentService.getOne(contentType, id);
+    if (!document) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'File not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return document;
   }
 
   @Put('collections/:contentType/:id')
-  updateOne(
+  async update(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
-    @Body() data: any,
+    @Body() data: Record<string, unknown>,
   ): Promise<any> {
-    return this.contentService.updateOne(contentType, id, document => ({
-      ...document,
-      ...data,
-    }));
+    try {
+      const document = await this.contentService.update(
+        contentType,
+        id,
+        document => ({
+          ...document,
+          ...data,
+        }),
+      );
+      return document;
+    } catch (err) {
+      if (err.msg === 'File not found') {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'File not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      } else {
+        throw err;
+      }
+    }
   }
 
   @Post('collections/:contentType')
-  createOne(
+  create(
     @Param('contentType') contentType: string,
-    @Body() data: any,
+    @Body() data: Record<string, unknown>,
   ): Promise<any> {
-    return this.contentService.createOne(contentType, data);
+    return this.contentService.create(contentType, data);
   }
 
   @Delete('collections/:contentType/:id')
-  deleteOne(
+  async delete(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
   ): Promise<any> {
-    return this.contentService.deleteOne(contentType, id);
+    try {
+      const document = await this.contentService.delete(contentType, id);
+      return document;
+    } catch (err) {
+      if (err.msg === 'File not found') {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'File not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      } else {
+        throw err;
+      }
+    }
   }
 }
