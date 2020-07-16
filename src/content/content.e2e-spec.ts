@@ -1,9 +1,9 @@
 import * as request from 'supertest';
-import * as dotenv from 'dotenv';
 import { equal } from 'assert';
 import * as fse from 'fs-extra';
-
+import * as dotenv from 'dotenv';
 dotenv.config();
+
 const { DB_DIR, PORT } = process.env;
 process.env.DB_DIR = `${__dirname}/database`;
 const URL = `localhost:${PORT}`;

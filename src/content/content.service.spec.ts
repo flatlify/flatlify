@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ContentService } from './content.service';
 import { GitDBService } from '../git-db/git-db.service';
 import { ContentTypeService } from '../content-type/content-type.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('ContentService', () => {
   let contentService: ContentService;
@@ -9,7 +10,12 @@ describe('ContentService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ContentService, GitDBService, ContentTypeService],
+      providers: [
+        ContentService,
+        GitDBService,
+        ContentTypeService,
+        ConfigService,
+      ],
     }).compile();
 
     contentService = module.get<ContentService>(ContentService);
@@ -26,7 +32,7 @@ describe('ContentService', () => {
       .spyOn(gitDBService, 'getData')
       .mockImplementation(async () => [1, 2, 3]);
     const returnedValue = await contentService.getMany('collection', {
-      ids: ['1', '2', '3'],
+      id: ['1', '2', '3'],
     });
 
     expect(gitDBService.getData).toBeCalledWith(
@@ -45,7 +51,7 @@ describe('ContentService', () => {
         testResult = testArray.filter(func);
         return [];
       });
-    await contentService.getMany('collection', { ids: ['1', '4'] });
+    await contentService.getMany('collection', { id: ['1', '4'] });
 
     expect(testResult).toStrictEqual([{ id: '1' }, { id: '4' }]);
   });
@@ -89,7 +95,7 @@ describe('ContentService', () => {
     expect(testResult).toStrictEqual({ id: '3' });
   });
 
-  it('should call gitDb updateOne', async () => {
+  it('should call gitDb update', async () => {
     const testObject = { id: '1' };
     const modifier = e => e;
     jest
@@ -106,10 +112,10 @@ describe('ContentService', () => {
       expect.any(Function),
       modifier,
     );
-    expect(returnedValue).toStrictEqual([testObject]);
+    expect(returnedValue).toStrictEqual(testObject);
   });
 
-  it('should create correct filter function in updateOne', async () => {
+  it('should create correct filter function in update', async () => {
     let testResult;
     const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
 
@@ -117,28 +123,25 @@ describe('ContentService', () => {
       .spyOn(gitDBService, 'update')
       .mockImplementation(async (collectionName, func) => {
         testResult = testArray.filter(func);
-        return [];
+        return ['random value'];
       });
     await contentService.update('collection', '4', e => e);
 
     expect(testResult).toStrictEqual([{ id: '4' }]);
   });
 
-  it('should call gitDb createOne', async () => {
+  it('should call gitDb create', async () => {
     const testObject = { id: '1' };
     jest
       .spyOn(gitDBService, 'insert')
       .mockImplementation(async () => testObject);
-    const returnedValue = await contentService.create(
-      'collection',
-      testObject,
-    );
+    const returnedValue = await contentService.create('collection', testObject);
 
     expect(gitDBService.insert).toBeCalledWith('collection', testObject);
     expect(returnedValue).toStrictEqual(testObject);
   });
 
-  it('should call gitDb deleteOne', async () => {
+  it('should call gitDb delete', async () => {
     const testObject = { id: '1' };
     jest
       .spyOn(gitDBService, 'delete')
@@ -152,14 +155,14 @@ describe('ContentService', () => {
     expect(returnedValue).toStrictEqual(testObject);
   });
 
-  it('should create correct filter function in deleteOne', async () => {
+  it('should create correct filter function in delete', async () => {
     let testResult;
     const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
     jest
       .spyOn(gitDBService, 'delete')
       .mockImplementation(async (collectionName, func) => {
         testResult = testArray.filter(func);
-        return [];
+        return ['random value'];
       });
     await contentService.delete('collection', '1');
 
