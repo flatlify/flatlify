@@ -22,7 +22,7 @@ export class ContentTypeController {
   async createOne(@Param('contentType') contentType: string): Promise<any> {
     try {
       const createdType = await this.contentTypeService.create(contentType);
-      return createdType;
+      return { name: createdType };
     } catch (err) {
       if (err.code === 'EEXIST') {
         throw new HttpException(

@@ -19,6 +19,7 @@ describe('Content type', () => {
   it(`can create and delete collection`, async () => {
     await request(URL)
       .post('/content-type/collections/new-content-type')
+      .expect({ name: 'new-content-type' })
       .expect(201);
 
     await request(URL)
