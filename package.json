@@ -19,12 +19,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./jest-e2e.json --runInBand ",
-    "docker:build": "docker build -t flatlify-image .",
-    "docker:run": "docker run -e PORT=4000 -e DB_DIR=/app/database --name flatlify-tests -idt -v $(pwd):/app flatlify-image",
+    "docker:build": "docker build --build-arg NPM_TOKEN=${NPM_TOKEN} -t flatlify-image .",
+    "docker:run": "docker run -e PORT=4000 -e DB_DIR=/app/database -e NPM_TOKEN=${NPM_TOKEN} --name flatlify-tests -dit flatlify-image",
     "docker:start": "docker start flatlify-tests",
     "docker:rm": "docker rm --force flatlify-tests",
-    "docker:e2e": "docker exec -it  flatlify-tests npm run test:e2e",
-    "docker:test": "docker exec -it  flatlify-tests npm run test"
+    "docker:e2e": "docker exec flatlify-tests npm run test:e2e",
+    "docker:test": "docker exec flatlify-tests npm run test"
   },
   "dependencies": {
     "@flatlify/gitdb": "^0.1.7",

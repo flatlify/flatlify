@@ -1,6 +1,7 @@
 FROM node:12
 
 # Create app directory
+ARG NPM_TOKEN
 WORKDIR /app
 
 # Install app dependencies
@@ -16,5 +17,5 @@ RUN npm install
 COPY . /app
 
 EXPOSE 3000
-# 
+RUN git init
 CMD ["npm", "start"]

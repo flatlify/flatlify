@@ -10,13 +10,15 @@ on:
     branches: [dev, nest, nest-dev]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [12.x]
 
+    env:
+      NPM_TOKEN: ${{secrets.NPM_TOKEN}}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -26,5 +28,5 @@ jobs:
 
       - run: npm run docker:build --if-present
       - run: npm run docker:run
-      - run: npm run docker:e2e
       - run: npm run docker:test
+      - run: npm run docker:e2e
