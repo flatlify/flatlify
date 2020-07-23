@@ -1,9 +1,8 @@
 {
   "name": "@flatlify/flatlify",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "author": "",
-  "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -26,6 +25,12 @@
     "docker:e2e": "docker exec flatlify-tests npm run test:e2e",
     "docker:test": "docker exec flatlify-tests npm run test"
   },
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "dependencies": {
     "@flatlify/gitdb": "^0.1.7",
     "@nestjs/common": "^7.2.0",
