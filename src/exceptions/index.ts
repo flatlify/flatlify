@@ -5,3 +5,9 @@ export class CollectionNotFound extends HttpException {
     super('Collection not found', HttpStatus.NOT_FOUND);
   }
 }
+
+export class FileNotFound extends HttpException {
+  constructor() {
+    super('File not found', HttpStatus.NOT_FOUND);
+  }
+}

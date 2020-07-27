@@ -40,20 +40,6 @@ export class ContentTypeController {
 
   @Delete(':contentType')
   async delete(@Param('contentType') contentType: string): Promise<any> {
-    try {
-      await this.contentTypeService.delete(contentType);
-    } catch (err) {
-      if (err.msg === "Collection doesn't exist") {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: "Collection doesn't exist",
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      } else {
-        throw err;
-      }
-    }
+    await this.contentTypeService.delete(contentType);
   }
 }

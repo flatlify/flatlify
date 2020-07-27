@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { GitDBService } from '../git-db/git-db.service';
 import { SetCallback } from '@flatlify/gitdb';
+import { FileNotFound } from '../exceptions';
 
 interface getManyParams {
   pagination?: {
@@ -64,7 +65,7 @@ export class ContentService {
       modifier,
     );
     if (!updatedDocuments.length) {
-      throw { msg: 'File not found' };
+      throw new FileNotFound();
     }
     return updatedDocuments[0];
   }
@@ -82,7 +83,7 @@ export class ContentService {
       document => document.id === id,
     );
     if (!deletedDocuments.length) {
-      throw { msg: 'File not found' };
+      throw new FileNotFound();
     }
     return deletedDocuments[0];
   }

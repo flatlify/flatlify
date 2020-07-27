@@ -35,15 +35,6 @@ export class ContentController {
     @Param('id') id: string,
   ): Promise<any> {
     const document = await this.contentService.getOne(contentType, id);
-    if (!document) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: 'File not found',
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
     return document;
   }
 
@@ -53,29 +44,15 @@ export class ContentController {
     @Param('id') id: string,
     @Body() data: Record<string, unknown>,
   ): Promise<any> {
-    try {
-      const document = await this.contentService.update(
-        contentType,
-        id,
-        document => ({
-          ...document,
-          ...data,
-        }),
-      );
-      return document;
-    } catch (err) {
-      if (err.msg === 'File not found') {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: 'File not found',
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      } else {
-        throw err;
-      }
-    }
+    const document = await this.contentService.update(
+      contentType,
+      id,
+      document => ({
+        ...document,
+        ...data,
+      }),
+    );
+    return document;
   }
 
   @Post(':contentType')
@@ -91,21 +68,7 @@ export class ContentController {
     @Param('contentType') contentType: string,
     @Param('id') id: string,
   ): Promise<any> {
-    try {
-      const document = await this.contentService.delete(contentType, id);
-      return document;
-    } catch (err) {
-      if (err.msg === 'File not found') {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: 'File not found',
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      } else {
-        throw err;
-      }
-    }
+    const document = await this.contentService.delete(contentType, id);
+    return document;
   }
 }
