@@ -17,7 +17,7 @@ import { IGetMany } from './content.interfaces';
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
-  @Get('collections/:contentType')
+  @Get(':contentType')
   getMany(
     @Query() query: IGetMany,
     @Param('contentType') contentType: string,
@@ -29,7 +29,7 @@ export class ContentController {
     });
   }
 
-  @Get('collections/:contentType/:id')
+  @Get(':contentType/:id')
   async getOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
@@ -47,7 +47,7 @@ export class ContentController {
     return document;
   }
 
-  @Put('collections/:contentType/:id')
+  @Put(':contentType/:id')
   async update(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
@@ -78,7 +78,7 @@ export class ContentController {
     }
   }
 
-  @Post('collections/:contentType')
+  @Post(':contentType')
   create(
     @Param('contentType') contentType: string,
     @Body() data: Record<string, unknown>,
@@ -86,7 +86,7 @@ export class ContentController {
     return this.contentService.create(contentType, data);
   }
 
-  @Delete('collections/:contentType/:id')
+  @Delete(':contentType/:id')
   async delete(
     @Param('contentType') contentType: string,
     @Param('id') id: string,

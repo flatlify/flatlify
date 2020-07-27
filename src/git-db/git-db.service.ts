@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { GitDB, Filter, SetCallback } from '@flatlify/gitdb';
+import { GitDB, Filter, SetCallback } from '@flatlify/gitdb'; //'../../../gitdb/src/index'; //
 import { ConfigService } from '@nestjs/config';
+import { CollectionNotFound } from '../exceptions';
 
 @Injectable()
 export class GitDBService {
@@ -18,6 +19,7 @@ export class GitDBService {
       dbDir,
     };
     this.gitdb = new GitDB(config);
+    this.gitdb.init();
   }
 
   public list(): string[] {
@@ -38,35 +40,45 @@ export class GitDBService {
   }
 
   public async getAll(collectionName: string): Promise<any[]> {
-    return this.gitdb.get(collectionName).getAll();
+    const collection = await this.getCollection(collectionName);
+
+    return collection.getAll();
   }
 
   public async getData(
     collectionName: string,
     callback: (any) => boolean,
   ): Promise<any[]> {
-    return this.gitdb.get(collectionName).getData(callback);
+    return this.getCollection(collectionName).getData(callback);
   }
 
   public async insert(
     collectionName: string,
     documentData: Record<string, unknown>,
   ): Promise<any> {
-    return this.gitdb.get(collectionName).insert(documentData);
+    return this.getCollection(collectionName).insert(documentData);
   }
 
   public async update(
     collectionName: string,
     filter: Filter<any>,
-    modifier: SetCallback<any>,
+    modifier: SetCallback<any, any>,
   ): Promise<any[]> {
-    return this.gitdb.get(collectionName).update(filter, modifier);
+    return this.getCollection(collectionName).update(filter, modifier);
   }
 
   public async delete(
     collectionName: string,
     filter: Filter<any>,
   ): Promise<any[]> {
-    return this.gitdb.get(collectionName).delete(filter);
+    return this.getCollection(collectionName).delete(filter);
+  }
+
+  private getCollection(collectionName) {
+    const collection = this.gitdb.get(collectionName);
+    if (!collection) {
+      throw new CollectionNotFound();
+    }
+    return collection;
   }
 }

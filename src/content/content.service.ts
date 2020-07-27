@@ -54,7 +54,7 @@ export class ContentService {
   async update(
     collectionName: string,
     id: string,
-    modifier: SetCallback<any>,
+    modifier: SetCallback<any, any>,
   ): Promise<any> {
     const updatedDocuments = await this.gitDBService.update(
       collectionName,

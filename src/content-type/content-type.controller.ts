@@ -13,12 +13,12 @@ import { ContentTypeService } from './content-type.service';
 export class ContentTypeController {
   constructor(private readonly contentTypeService: ContentTypeService) {}
 
-  @Get('collections')
+  @Get('')
   list(): Promise<any[]> {
     return this.contentTypeService.list();
   }
 
-  @Post('collections/:contentType')
+  @Post(':contentType')
   async createOne(@Param('contentType') contentType: string): Promise<any> {
     try {
       const createdType = await this.contentTypeService.create(contentType);
@@ -38,7 +38,7 @@ export class ContentTypeController {
     }
   }
 
-  @Delete('collections/:contentType')
+  @Delete(':contentType')
   async delete(@Param('contentType') contentType: string): Promise<any> {
     try {
       await this.contentTypeService.delete(contentType);
