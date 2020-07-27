@@ -55,15 +55,4 @@ describe('Content type', () => {
       .expect(200)
       .expect(['new-content-type-one', 'new-content-type-two']);
   });
-
-  it(`list works properly`, async () => {
-    await request(URL).post('/content-type/collections/new-content-type-one');
-
-    await request(URL).post('/content-type/collections/new-content-type-two');
-
-    await request(URL)
-      .get('/content-type/collections')
-      .expect(200)
-      .expect(['new-content-type-one', 'new-content-type-two']);
-  });
 });
