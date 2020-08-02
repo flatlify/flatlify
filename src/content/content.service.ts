@@ -1,17 +1,18 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { GitDBService } from '../git-db/git-db.service';
 import { SetCallback } from '@flatlify/gitdb';
+import { FileNotFound, CollectionNotFound } from '../exceptions';
 
 interface getManyParams {
   pagination?: {
-    perPage?: number;
-    page?: number;
+    start?: number;
+    limit?: number;
   };
   sort?: {
     order?: string;
     field?: string;
   };
-  ids: string[];
+  id?: string[];
 }
 
 @Injectable()
@@ -22,20 +23,18 @@ export class ContentService {
 
   async getMany(collectionName: string, params: getManyParams): Promise<any[]> {
     const {
-      pagination: { page = 0, perPage = 25 },
-      sort: { order = 'ASC', field = 'id' },
-      ids,
+      pagination: { start = 0, limit = 25 } = {},
+      sort: { order = 'ASC', field = 'id' } = {},
+      id,
     } = params;
 
-    const start = page * perPage;
-    const end = start + perPage;
-    const data = ids
+    const data = id
       ? await this.gitDBService.getData(collectionName, document =>
-          ids.includes(document.id),
+          id.includes(document.id),
         )
       : await this.gitDBService.getAll(collectionName);
 
-    return data.slice(start, end).sort((a, b) => {
+    return data.slice(start, start + limit).sort((a, b) => {
       if (a[field] < b[field]) {
       }
       if (a[field] > b[field]) {
@@ -46,47 +45,49 @@ export class ContentService {
   }
 
   async getOne(collectionName: string, id: string): Promise<any> {
-    return this.gitDBService.getData(collectionName, e => e.id === id);
-  }
-
-  updateMany(
-    collectionName: string,
-    ids: string[],
-    modifier: SetCallback<any>,
-  ): Promise<any> {
-    return this.gitDBService.update(
+    const result = await this.gitDBService.getData(
       collectionName,
-      document => ids.includes(document.id),
-      modifier,
+      e => e.id === id,
     );
+    if (!result[0]) {
+      throw new CollectionNotFound();
+    }
+    return result[0];
   }
 
-  async updateOne(
+  async update(
     collectionName: string,
     id: string,
-    modifier: SetCallback<any>,
+    modifier: SetCallback<any, any>,
   ): Promise<any> {
-    return this.gitDBService.update(
+    const updatedDocuments = await this.gitDBService.update(
       collectionName,
-      document => document.id === id,
+      document => {
+        return document.id === id;
+      },
       modifier,
     );
+    if (!updatedDocuments.length) {
+      throw new FileNotFound();
+    }
+    return updatedDocuments[0];
   }
 
-  async createOne(collectionName: string, document: any): Promise<any> {
+  async create(
+    collectionName: string,
+    document: Record<string, unknown>,
+  ): Promise<any> {
     return this.gitDBService.insert(collectionName, document);
   }
 
-  async deleteOne(collectionName: string, id: string): Promise<any> {
-    return this.gitDBService.delete(
+  async delete(collectionName: string, id: string): Promise<any> {
+    const deletedDocuments = await this.gitDBService.delete(
       collectionName,
       document => document.id === id,
     );
-  }
-
-  async deleteMany(collectionName: string, ids: string[]): Promise<any[]> {
-    return this.gitDBService.delete(collectionName, document =>
-      ids.includes(document.id),
-    );
+    if (!deletedDocuments.length) {
+      throw new FileNotFound();
+    }
+    return deletedDocuments[0];
   }
 }

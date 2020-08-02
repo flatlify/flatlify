@@ -1,63 +1,185 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContentService } from './content.service';
 import { GitDBService } from '../git-db/git-db.service';
+import { ContentTypeService } from '../content-type/content-type.service';
+import { ConfigService } from '@nestjs/config';
+
+jest.mock('@flatlify/gitdb', () => {
+  return {
+    GitDB: jest.fn().mockImplementation(() => {
+      return {
+        init: () => {
+          return null;
+        },
+      };
+    }),
+  };
+});
 
 describe('ContentService', () => {
-  let service: ContentService;
+  let contentService: ContentService;
   let gitDBService: GitDBService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ContentService, GitDBService],
+      providers: [
+        ContentService,
+        GitDBService,
+        ContentTypeService,
+        ConfigService,
+      ],
     }).compile();
 
-    service = module.get<ContentService>(ContentService);
+    contentService = module.get<ContentService>(ContentService);
     gitDBService = module.get<GitDBService>(GitDBService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(contentService).toBeDefined();
   });
 
-  it('should call gitDBService getMany', async () => {
-    jest.spyOn(gitDBService, 'list').mockImplementation(() => []);  
-    await service.getMany();
-    expect(gitDBService.getMany).toBeCalled();
+  it('should call gitDb getMany with ids', async () => {
+    const testArray = [1, 2, 3];
+    jest
+      .spyOn(gitDBService, 'getData')
+      .mockImplementation(async () => [1, 2, 3]);
+    const returnedValue = await contentService.getMany('collection', {
+      id: ['1', '2', '3'],
+    });
+
+    expect(gitDBService.getData).toBeCalledWith(
+      'collection',
+      expect.any(Function),
+    );
+    expect(returnedValue).toStrictEqual(testArray);
   });
 
-  it('should call gitDBService getOne', async () => {
-    jest.spyOn(gitDBService, 'list').mockImplementation(() => []);
-    await service.getOne();
-    expect(gitDBService.getOne).toBeCalled();
+  it('should create correct filter function in getMany', async () => {
+    let testResult;
+    const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
+    jest
+      .spyOn(gitDBService, 'getData')
+      .mockImplementation(async (collectionName, func) => {
+        testResult = testArray.filter(func);
+        return [];
+      });
+    await contentService.getMany('collection', { id: ['1', '4'] });
+
+    expect(testResult).toStrictEqual([{ id: '1' }, { id: '4' }]);
   });
 
-  it('should call gitDBService updateMany', async () => {
-    jest.spyOn(gitDBService, 'updateMany').mockImplementation(() => []);
-    await service.updateMany();
-    expect(gitDBService.updateMany).toBeCalled();
+  it('should call gitDb getAll', async () => {
+    const testArray = [1, 2, 3];
+    jest
+      .spyOn(gitDBService, 'getAll')
+      .mockImplementation(async () => [1, 2, 3]);
+    const returnedValue = await contentService.getMany('collection', {});
+
+    expect(gitDBService.getAll).toBeCalledWith('collection');
+    expect(returnedValue).toStrictEqual(testArray);
   });
 
-  it('should call gitDBService updateOne', async () => {
-    jest.spyOn(gitDBService, 'updateOne').mockImplementation(() => []);
-    await service.updateOne();
-    expect(gitDBService.updateOne).toBeCalled();
+  it('should call gitDb getOne', async () => {
+    const testObject = { id: '1' };
+    jest
+      .spyOn(gitDBService, 'getData')
+      .mockImplementation(async () => [testObject, { id: 5 }]);
+    const returnedValue = await contentService.getOne('collection', '1');
+
+    expect(gitDBService.getData).toBeCalledWith(
+      'collection',
+      expect.any(Function),
+    );
+    expect(returnedValue).toStrictEqual(testObject);
   });
 
-  it('should call gitDBService createOne', async () => {
-    jest.spyOn(gitDBService, 'createOne').mockImplementation(() => []);
-    await service.createOne();
-    expect(gitDBService.createOne).toBeCalled();
+  it('should create correct filter function in getOne', async () => {
+    let testResult;
+    const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
+
+    jest
+      .spyOn(gitDBService, 'getData')
+      .mockImplementation(async (collectionName, func) => {
+        testResult = testArray.filter(func)[0];
+        return ['data'];
+      });
+
+    await contentService.getOne('collection', '3');
+
+    expect(testResult).toStrictEqual({ id: '3' });
   });
 
-  it('should call gitDBService deleteOne', async () => {
-    jest.spyOn(gitDBService, 'deleteOne').mockImplementation(() => []);
-    await service.deleteOne();
-    expect(gitDBService.deleteOne).toBeCalled();
+  it('should call gitDb update', async () => {
+    const testObject = { id: '1' };
+    const modifier = e => e;
+    jest
+      .spyOn(gitDBService, 'update')
+      .mockImplementation(async () => [testObject]);
+    const returnedValue = await contentService.update(
+      'collection',
+      '1',
+      modifier,
+    );
+
+    expect(gitDBService.update).toBeCalledWith(
+      'collection',
+      expect.any(Function),
+      modifier,
+    );
+    expect(returnedValue).toStrictEqual(testObject);
   });
 
-  it('should call gitDBService deleteMany', async () => {
-    jest.spyOn(gitDBService, 'deleteMany').mockImplementation(() => []);
-    await service.deleteMany();
-    expect(gitDBService.deleteMany).toBeCalled();
+  it('should create correct filter function in update', async () => {
+    let testResult;
+    const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
+
+    jest
+      .spyOn(gitDBService, 'update')
+      .mockImplementation(async (collectionName, func) => {
+        testResult = testArray.filter(func);
+        return ['random value'];
+      });
+    await contentService.update('collection', '4', e => e);
+
+    expect(testResult).toStrictEqual([{ id: '4' }]);
+  });
+
+  it('should call gitDb create', async () => {
+    const testObject = { id: '1' };
+    jest
+      .spyOn(gitDBService, 'insert')
+      .mockImplementation(async () => testObject);
+    const returnedValue = await contentService.create('collection', testObject);
+
+    expect(gitDBService.insert).toBeCalledWith('collection', testObject);
+    expect(returnedValue).toStrictEqual(testObject);
+  });
+
+  it('should call gitDb delete', async () => {
+    const testObject = { id: '1' };
+    jest
+      .spyOn(gitDBService, 'delete')
+      .mockImplementation(async () => [testObject]);
+    const returnedValue = await contentService.delete('collection', '1');
+
+    expect(gitDBService.delete).toBeCalledWith(
+      'collection',
+      expect.any(Function),
+    );
+    expect(returnedValue).toStrictEqual(testObject);
+  });
+
+  it('should create correct filter function in delete', async () => {
+    let testResult;
+    const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
+    jest
+      .spyOn(gitDBService, 'delete')
+      .mockImplementation(async (collectionName, func) => {
+        testResult = testArray.filter(func);
+        return ['random value'];
+      });
+    await contentService.delete('collection', '1');
+
+    expect(testResult).toStrictEqual([{ id: '1' }]);
   });
 });

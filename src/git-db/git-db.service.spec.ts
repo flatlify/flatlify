@@ -1,12 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitDBService } from './git-db.service';
+import { ConfigService } from '@nestjs/config';
+
+jest.mock('@flatlify/gitdb', () => {
+  return {
+    GitDB: jest.fn().mockImplementation(() => {
+      return {
+        init: () => {
+          return null;
+        },
+      };
+    }),
+  };
+});
 
 describe('GitDbService', () => {
   let service: GitDBService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [GitDBService],
+      providers: [GitDBService, ConfigService],
     }).compile();
 
     service = module.get<GitDBService>(GitDBService);

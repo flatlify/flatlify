@@ -7,80 +7,68 @@ import {
   Query,
   Param,
   Body,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
-import { IGetMany, IQueryIds } from './content.interfaces';
+import { IGetMany } from './content.interfaces';
 
 @Controller('content')
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
-  @Get('collections/:contentType')
+  @Get(':contentType')
   getMany(
     @Query() query: IGetMany,
     @Param('contentType') contentType: string,
   ): Promise<any[]> {
     return this.contentService.getMany(contentType, {
-      pagination: { page: query.page, perPage: query.perPage },
+      pagination: { limit: query.limit, start: query.start },
       sort: { order: query.order, field: query.field },
-      ids: query.ids,
+      id: query.id,
     });
   }
 
-  @Get('collections/:contentType/:id')
-  getOne(
-    @Param('contentType') contentType: string,
-    @Param('id') id: string,
-    @Body() data: any,
-  ): Promise<any> {
-    return this.contentService.getOne(contentType, id);
-  }
-
-  @Put('collections/:contentType')
-  updateMany(
-    @Param('contentType') contentType: string,
-    @Query() query: IQueryIds,
-    @Body() data: any,
-  ): Promise<any[]> {
-    return this.contentService.updateMany(contentType, query.ids, document => ({
-      ...document,
-      ...data,
-    }));
-  }
-
-  @Put('collections/:contentType/:id')
-  updateOne(
-    @Param('contentType') contentType: string,
-    @Param('id') id: string,
-    @Body() data: any,
-  ): Promise<any> {
-    return this.contentService.updateOne(contentType, id, document => ({
-      ...document,
-      ...data,
-    }));
-  }
-
-  @Post('collections/:contentType')
-  createOne(
-    @Param('contentType') contentType: string,
-    @Body() data: any,
-  ): Promise<any> {
-    return this.contentService.createOne(contentType, data);
-  }
-
-  @Delete('collections/:contentType')
-  deleteMany(
-    @Param('contentType') contentType: string,
-    @Query() query: IQueryIds,
-  ): Promise<any[]> {
-    return this.contentService.deleteMany(contentType, query.ids);
-  }
-
-  @Delete('collections/:contentType/:id')
-  deleteOne(
+  @Get(':contentType/:id')
+  async getOne(
     @Param('contentType') contentType: string,
     @Param('id') id: string,
   ): Promise<any> {
-    return this.contentService.deleteOne(contentType, id);
+    const document = await this.contentService.getOne(contentType, id);
+    return document;
+  }
+
+  @Put(':contentType/:id')
+  async update(
+    @Param('contentType') contentType: string,
+    @Param('id') id: string,
+    @Body() data: Record<string, unknown>,
+  ): Promise<any> {
+    const document = await this.contentService.update(
+      contentType,
+      id,
+      document => ({
+        ...document,
+        ...data,
+      }),
+    );
+    return document;
+  }
+
+  @Post(':contentType')
+  create(
+    @Param('contentType') contentType: string,
+    @Body() data: Record<string, unknown>,
+  ): Promise<any> {
+    return this.contentService.create(contentType, data);
+  }
+
+  @Delete(':contentType/:id')
+  async delete(
+    @Param('contentType') contentType: string,
+    @Param('id') id: string,
+  ): Promise<any> {
+    const document = await this.contentService.delete(contentType, id);
+    return document;
   }
 }
