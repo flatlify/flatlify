@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { GitDBService } from '../git-db/git-db.service';
 import { SetCallback } from '@flatlify/gitdb';
-import { FileNotFound } from '../exceptions';
+import { FileNotFound, CollectionNotFound } from '../exceptions';
 
 interface getManyParams {
   pagination?: {
@@ -50,7 +50,7 @@ export class ContentService {
       e => e.id === id,
     );
     if (!result[0]) {
-      throw new FileNotFound();
+      throw new CollectionNotFound();
     }
     return result[0];
   }
