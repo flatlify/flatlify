@@ -18,4 +18,4 @@ COPY . /app
 
 EXPOSE 3000
 RUN git init
-CMD ["npm", "start"]
+CMD ["npm", "run", "test:server"]

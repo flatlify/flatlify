@@ -12,20 +12,20 @@ describe('Content', () => {
   beforeAll(async () => {
     await fse.ensureDir(DB_DIR);
     await request(URL)
-      .post('/content-type/collections/test-content-type')
+      .post('/content-type/test-content-type')
       .send({});
   });
 
   afterAll(async () => {
     await request(URL)
-      .delete('/content-type/collections/test-content-type')
+      .delete('/content-type/test-content-type')
       .send({});
     await fse.remove(DB_DIR);
   });
 
   it(`can create document inside collection`, async () => {
     await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info' })
       .expect(201)
       .expect(res => equal(res.info, 'info'));
@@ -33,32 +33,32 @@ describe('Content', () => {
 
   it(`can create and delete document inside collection`, async () => {
     const data = await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info' })
       .expect(201);
 
     await request(URL)
-      .delete(`/content/collections/test-content-type/${data.body.id}`)
+      .delete(`/content/test-content-type/${data.body.id}`)
       .expect(200);
   });
 
   it(`cannot delete non existing document`, async () => {
     await request(URL)
-      .delete(`/content/collections/test-content-type/random-id`)
+      .delete(`/content/test-content-type/random-id`)
       .expect(404);
   });
 
   it(`can get multiple documents`, async () => {
     const documentOne = await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info one' });
 
     const documentTwo = await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info two' });
 
     await request(URL)
-      .get(`/content/collections/test-content-type`)
+      .get(`/content/test-content-type`)
       .query({ ids: [documentOne.body.id, documentTwo.body.id] })
       .expect(
         res =>
@@ -68,47 +68,47 @@ describe('Content', () => {
 
   it(`can get one document`, async () => {
     const document = await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info' });
 
     await request(URL)
-      .get(`/content/collections/test-content-type/${document.body.id}`)
+      .get(`/content/test-content-type/${document.body.id}`)
       .expect(res => res.body.info === 'info');
   });
 
   it(`cannot get non existing document`, async () => {
     await request(URL)
-      .get(`/content/collections/test-content-type/random-id`)
+      .get(`/content/test-content-type/random-id`)
       .expect(404);
   });
 
   it(`can update document`, async () => {
     const document = await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info' });
 
     await request(URL)
-      .put(`/content/collections/test-content-type/${document.body.id}`)
+      .put(`/content/test-content-type/${document.body.id}`)
       .send({ info: 'new info', newField: 'newField' })
       .expect(200);
 
     await request(URL)
-      .get(`/content/collections/test-content-type/${document.body.id}`)
+      .get(`/content/test-content-type/${document.body.id}`)
       .expect({ id: document.body.id, info: 'new info', newField: 'newField' });
   });
 
   it(`can't update id`, async () => {
     const document = await request(URL)
-      .post('/content/collections/test-content-type')
+      .post('/content/test-content-type')
       .send({ info: 'info' });
 
     await request(URL)
-      .put(`/content/collections/test-content-type/${document.body.id}`)
+      .put(`/content/test-content-type/${document.body.id}`)
       .send({ id: '1232135', info: 'new info', newField: 'newField' })
       .expect(200);
 
     await request(URL)
-      .get(`/content/collections/test-content-type/${document.body.id}`)
+      .get(`/content/test-content-type/${document.body.id}`)
       .expect({ id: document.body.id, info: 'new info', newField: 'newField' });
   });
 });

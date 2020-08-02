@@ -18,40 +18,40 @@ describe('Content type', () => {
 
   it(`can create and delete collection`, async () => {
     await request(URL)
-      .post('/content-type/collections/new-content-type')
+      .post('/content-type/new-content-type')
       .expect({ name: 'new-content-type' })
       .expect(201);
 
     await request(URL)
-      .delete('/content-type/collections/new-content-type')
+      .delete('/content-type/new-content-type')
       .expect(200);
   });
 
   it(`should fail if attempted to create collection which already exists`, async () => {
     try {
-      await request(URL).post('/content-type/collections/new-content-type');
+      await request(URL).post('/content-type/new-content-type');
 
       await request(URL)
-        .post('/content-type/collections/new-content-type')
+        .post('/content-type/new-content-type')
         .expect(409);
     } finally {
-      await request(URL).delete('/content-type/collections/new-content-type');
+      await request(URL).delete('/content-type/new-content-type');
     }
   });
 
   it(`should fail if attempted to delete non existing collection`, async () => {
     await request(URL)
-      .delete('/content-type/collections/new-content-type')
+      .delete('/content-type/new-content-type')
       .expect(404);
   });
 
   it(`list works properly`, async () => {
-    await request(URL).post('/content-type/collections/new-content-type-one');
+    await request(URL).post('/content-type/new-content-type-one');
 
-    await request(URL).post('/content-type/collections/new-content-type-two');
+    await request(URL).post('/content-type/new-content-type-two');
 
     await request(URL)
-      .get('/content-type/collections')
+      .get('/content-type')
       .expect(200)
       .expect(['new-content-type-one', 'new-content-type-two']);
   });

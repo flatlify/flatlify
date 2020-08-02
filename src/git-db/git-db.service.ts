@@ -36,7 +36,9 @@ export class GitDBService {
   }
 
   public async deleteCollection(collectionName: string): Promise<string> {
-    return this.gitdb.delete(collectionName);
+    if (this.getCollection(collectionName)) {
+      return this.gitdb.delete(collectionName);
+    }
   }
 
   public async getAll(collectionName: string): Promise<any[]> {

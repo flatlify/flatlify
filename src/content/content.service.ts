@@ -49,6 +49,9 @@ export class ContentService {
       collectionName,
       e => e.id === id,
     );
+    if (!result[0]) {
+      throw new FileNotFound();
+    }
     return result[0];
   }
 
