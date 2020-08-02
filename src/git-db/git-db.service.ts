@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { GitDB, Filter, SetCallback } from '@flatlify/gitdb'; //'../../../gitdb/src/index'; //
+import { GitDB, Filter, SetCallback, Collection } from '@flatlify/gitdb'; //'../../../gitdb/src/index'; //
 import { ConfigService } from '@nestjs/config';
 import { CollectionNotFound } from '../exceptions';
 
@@ -76,7 +76,7 @@ export class GitDBService {
     return this.getCollection(collectionName).delete(filter);
   }
 
-  private getCollection(collectionName) {
+  private getCollection(collectionName: string): Collection<any> {
     const collection = this.gitdb.get(collectionName);
     if (!collection) {
       throw new CollectionNotFound();

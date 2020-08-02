@@ -2,6 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GitDBService } from './git-db.service';
 import { ConfigService } from '@nestjs/config';
 
+jest.mock('@flatlify/gitdb', () => {
+  return {
+    GitDB: jest.fn().mockImplementation(() => {
+      return {
+        init: () => {
+          return null;
+        },
+      };
+    }),
+  };
+});
+
 describe('GitDbService', () => {
   let service: GitDBService;
 

@@ -18,4 +18,5 @@ COPY . /app
 
 EXPOSE 3000
 RUN git init
+RUN mkdir -p /app/database
 CMD ["npm", "run", "test:server"]

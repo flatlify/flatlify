@@ -4,6 +4,18 @@ import { GitDBService } from '../git-db/git-db.service';
 import { ContentTypeService } from '../content-type/content-type.service';
 import { ConfigService } from '@nestjs/config';
 
+jest.mock('@flatlify/gitdb', () => {
+  return {
+    GitDB: jest.fn().mockImplementation(() => {
+      return {
+        init: () => {
+          return null;
+        },
+      };
+    }),
+  };
+});
+
 describe('ContentService', () => {
   let contentService: ContentService;
   let gitDBService: GitDBService;
@@ -84,12 +96,14 @@ describe('ContentService', () => {
   it('should create correct filter function in getOne', async () => {
     let testResult;
     const testArray = [{ id: '1' }, { id: '3' }, { id: '4' }];
+
     jest
       .spyOn(gitDBService, 'getData')
       .mockImplementation(async (collectionName, func) => {
         testResult = testArray.filter(func)[0];
-        return [];
+        return ['data'];
       });
+
     await contentService.getOne('collection', '3');
 
     expect(testResult).toStrictEqual({ id: '3' });
