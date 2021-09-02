@@ -15,7 +15,7 @@
     "find-git-root": "^1.0.4",
     "fs-extra": "^9.0.0",
     "globby": "^11.0.0",
-    "isomorphic-git": "^0.72.1",
+    "isomorphic-git": "^1.8.2",
     "lodash": "^4.17.15",
     "multer": "^1.4.2",
     "uuid": "^7.0.3"
